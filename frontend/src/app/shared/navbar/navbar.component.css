@@ -1,0 +1,65 @@
+/* Navbar component styles */
+.navbar {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Profile dropdown animations */
+.profile-dropdown {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Wishlist heart animation */
+.wishlist-heart:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+/* Notification badge pulse */
+.notification-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+.nav-link {
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  transform: translateY(-1px);
+}
+
+/* Profile avatar gradient */
+.profile-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Dropdown menu items */
+.dropdown-item {
+  transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8fafc;
+  transform: translateX(4px);
+} 

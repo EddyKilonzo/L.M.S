@@ -5,6 +5,17 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Set global prefix
+  app.setGlobalPrefix('api');
+
+  // Enable CORS
+  app.enableCors({
+    origin: 'http://localhost:4200', // Angular dev server
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  });
+
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('LMS API')
@@ -21,7 +32,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
     },

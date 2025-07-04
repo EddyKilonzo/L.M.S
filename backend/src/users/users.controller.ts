@@ -6,6 +6,7 @@ import {
   Body,
   Delete,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -37,7 +38,7 @@ export class UsersController {
     description: 'Forbidden - Admin access required',
   })
   @Roles('ADMIN')
-  async findAll() {
+  async findAll(): Promise<UserResponse[]> {
     return await this.usersService.findAll();
   }
 
@@ -53,8 +54,12 @@ export class UsersController {
     description: 'Forbidden - Insufficient permissions',
   })
   @Roles('ADMIN', 'INSTRUCTOR', 'STUDENT')
-  async findOne(@Param('id') id: string) {
-    return await this.usersService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<UserResponse> {
+    const user = await this.usersService.findOne(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   @Patch(':id')
@@ -71,8 +76,37 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateData: UpdateUserDto,
     @CurrentUser() currentUser: UserResponse,
-  ) {
-    return await this.usersService.update(id, updateData, currentUser);
+  ): Promise<UserResponse> {
+    try {
+      const result = await this.usersService.update(
+        id,
+        updateData,
+        currentUser,
+      );
+      return result;
+    } catch (error: unknown) {
+      interface PrismaError extends Error {
+        code: string;
+      }
+
+      const isPrismaError = (err: unknown): err is PrismaError => {
+        return err instanceof Error && 'code' in err;
+      };
+
+      const errorDetails = {
+        userId: id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        code: isPrismaError(error) ? error.code : undefined,
+      };
+
+      console.error('Update failed:', errorDetails);
+
+      if (isPrismaError(error) && error.code === 'P2025') {
+        throw new NotFoundException('User not found');
+      }
+
+      throw error;
+    }
   }
 
   @Delete(':id')
@@ -88,7 +122,7 @@ export class UsersController {
   async remove(
     @Param('id') id: string,
     @CurrentUser() currentUser: UserResponse,
-  ) {
+  ): Promise<UserResponse> {
     return await this.usersService.remove(id, currentUser);
   }
 }

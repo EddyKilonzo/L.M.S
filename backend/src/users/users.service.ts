@@ -44,20 +44,29 @@ export class UsersService {
     if (currentUser.role !== 'ADMIN' && currentUser.id !== id) {
       throw new ForbiddenException('You can only update your own profile');
     }
-
-    const user = await this.prisma.user.update({
-      where: { id },
-      data: updateData,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isVerified: true,
-      },
-    });
-    return user as UserResponse;
+    try {
+      const user = await this.prisma.user.update({
+        where: { id },
+        data: updateData,
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          isVerified: true,
+          about: true,
+          profileProgress: true,
+        },
+      });
+      return user as UserResponse;
+    } catch (error) {
+      // Graceful error handling
+      if (error.code === 'P2025') {
+        throw new ForbiddenException('User not found');
+      }
+      throw new Error('Failed to update user profile. Please try again.');
+    }
   }
 
   async remove(id: string, currentUser: UserResponse): Promise<UserResponse> {

@@ -38,7 +38,7 @@ export class AuthService {
       const verificationCodeExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
       console.log('Creating user in database...');
-      const user = await this.prisma.user.create({
+      const created = await this.prisma.user.create({
         data: {
           ...registerDto,
           password: hashedPassword,
@@ -46,24 +46,30 @@ export class AuthService {
           verificationCode,
           verificationCodeExpiry,
         },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          isVerified: true,
+          about: true,
+          profileProgress: true,
+          createdAt: true,
+        },
       });
-
       console.log('User created successfully, sending verification email...');
-      // Send verification code email
       try {
         await this.mailerService.sendNumberVerificationEmail(
-          user.email,
+          created.email,
           verificationCode,
-          user.firstName,
+          created.firstName,
         );
         console.log('Verification email sent successfully');
       } catch (emailError) {
         console.error('Failed to send verification email:', emailError);
-        // Don't fail the registration if email fails, just log it
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+      return created;
     } catch (error: unknown) {
       console.error('Registration error:', error);
 
@@ -93,6 +99,12 @@ export class AuthService {
     });
 
     if (user && (await bcrypt.compare(loginDto.password, user.password))) {
+      if (!user.isVerified) {
+        throw new UnauthorizedException(
+          'Please verify your email before logging in',
+        );
+      }
+
       const payload = { email: user.email, sub: user.id, role: user.role };
       return {
         access_token: this.jwtService.sign(payload),
@@ -103,6 +115,7 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           isVerified: user.isVerified,
+          createdAt: user.createdAt,
         },
       };
     }
@@ -207,6 +220,7 @@ export class AuthService {
       lastName: user.lastName,
       role: user.role,
       isVerified: user.isVerified,
+      createdAt: user.createdAt,
     };
   }
 
@@ -221,6 +235,8 @@ export class AuthService {
     if (user.verificationCodeExpiry < new Date()) {
       throw new BadRequestException('Verification code expired');
     }
+    
+    // Update user verification status
     await this.prisma.user.update({
       where: { id: user.id },
       data: {
@@ -229,6 +245,83 @@ export class AuthService {
         verificationCodeExpiry: null,
       },
     });
+
+    // Send welcome email based on user role
+    try {
+      if (user.role === 'INSTRUCTOR') {
+        await this.mailerService.sendWelcomeInstructorEmail(
+          user.email,
+          user.firstName,
+        );
+        console.log('Welcome instructor email sent successfully');
+      } else {
+        await this.mailerService.sendWelcomeStudentEmail(
+          user.email,
+          user.firstName,
+        );
+        console.log('Welcome student email sent successfully');
+      }
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't throw error here as verification was successful
+    }
+
     return { message: 'Account verified successfully' };
+  }
+
+  async resendVerificationCode(email: string): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (user.isVerified) {
+      throw new BadRequestException('User is already verified');
+    }
+
+    // Generate new verification code
+    const verificationCode = Math.floor(
+      10000 + Math.random() * 90000,
+    ).toString();
+    const verificationCodeExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        verificationCode,
+        verificationCodeExpiry,
+      },
+    });
+
+    // Send new verification email
+    try {
+      await this.mailerService.sendNumberVerificationEmail(
+        user.email,
+        verificationCode,
+        user.firstName,
+      );
+      console.log('Verification email resent successfully');
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      throw new BadRequestException('Failed to send verification email');
+    }
+
+    return { message: 'Verification code resent successfully' };
+  }
+
+  async checkUserStatus(
+    email: string,
+  ): Promise<{ isVerified: boolean; message: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    return {
+      isVerified: user.isVerified,
+      message: user.isVerified
+        ? 'User is already verified'
+        : 'User is not verified',
+    };
   }
 }

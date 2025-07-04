@@ -53,6 +53,23 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   isVerified?: boolean;
+
+  @ApiProperty({
+    description: 'About me section',
+    example: 'I am a passionate learner.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  about?: string;
+
+  @ApiProperty({
+    description: 'Profile completion progress (0-100)',
+    example: 80,
+    required: false,
+  })
+  @IsOptional()
+  profileProgress?: number;
 }
 
 export interface JwtPayload {

@@ -1,0 +1,43 @@
+:root {
+    --primary: #4F46E5;
+    --secondary: #F9FAFB;
+    --dark: #1F2937;
+    --dark-gray: #6B7280;
+    --border-color: #E5E7EB;
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.bg-primary {
+    background-color: var(--primary);
+}
+
+.bg-secondary {
+    background-color: var(--secondary);
+}
+
+.text-dark {
+    color: var(--dark);
+}
+
+.text-dark-gray {
+    color: var(--dark-gray);
+}
+
+.border-border-color {
+    border-color: var(--border-color);
+}
+
+.form-radio:checked {
+    color: var(--primary);
+}
+
+.form-checkbox:checked {
+    color: var(--primary);
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}

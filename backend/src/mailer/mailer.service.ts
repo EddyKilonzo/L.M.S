@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import * as nodemailer from 'nodemailer';
 
 export interface EmailOptions {
   to: string;
@@ -21,26 +22,94 @@ export class MailerService {
     'mailer',
     'templates',
   );
+  private transporter: nodemailer.Transporter;
+
+  constructor() {
+    this.initializeTransporter();
+  }
+
+  private initializeTransporter() {
+    // Email configuration - you can use Gmail, Outlook, or any SMTP service
+    const emailConfig = {
+      host: process.env.MAIL_HOST || process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.MAIL_PORT || process.env.SMTP_PORT || '587'),
+      secure: process.env.MAIL_SECURE === 'true', // true for 465, false for other ports
+      auth: {
+        user:
+          process.env.MAIL_USER ||
+          process.env.SMTP_USER ||
+          'your-email@gmail.com',
+        pass:
+          process.env.MAIL_PASSWORD ||
+          process.env.SMTP_PASS ||
+          'your-app-password',
+      },
+    };
+
+    this.transporter = nodemailer.createTransport(emailConfig);
+
+    // Verify connection configuration (completely silent)
+    this.transporter.verify(() => {
+      // Silent verification - no logging
+    });
+  }
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
     try {
-      // TODO: Integrate with actual email service (SendGrid, AWS SES, etc.)
-      // Simulate async email sending
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      const mailOptions = {
+        from:
+          process.env.MAIL_FROM ||
+          `"E-Learning Platform" <${process.env.MAIL_USER || process.env.SMTP_USER || 'noreply@example.com'}>`,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+      };
 
-      this.logger.log(`📧 Email sent to ${options.to}: ${options.subject}`);
-      this.logger.debug(`Email content: ${options.html}`);
+      const info = await this.transporter.sendMail(mailOptions);
+
+      this.logger.log(`📧 Email sent successfully to ${options.to}`);
+      this.logger.log(`📧 Message ID: ${info.messageId}`);
+
+      // For development: Show verification code in console
+      if (options.subject.includes('Verification Code')) {
+        const codeMatch = options.html.match(/(\d{5})/);
+        if (codeMatch) {
+          this.logger.log(`🔐 VERIFICATION CODE: ${codeMatch[1]}`);
+          console.log(
+            `\n🔐 VERIFICATION CODE FOR ${options.to}: ${codeMatch[1]}\n`,
+          );
+        } else {
+          console.log(
+            '⚠️ Could not extract verification code from email content',
+          );
+          console.log('Email content:', options.html);
+        }
+      }
 
       return true;
     } catch (error) {
       this.logger.error(`Failed to send email to ${options.to}:`, error);
+
+      // Fallback to console logging if email fails
+      if (options.subject.includes('Verification Code')) {
+        const codeMatch = options.html.match(/(\d{5})/);
+        if (codeMatch) {
+          console.log(
+            `\n🔐 VERIFICATION CODE FOR ${options.to}: ${codeMatch[1]}\n`,
+          );
+          console.log(
+            "📧 Email sending failed, but here's the verification code for testing",
+          );
+        }
+      }
+
       return false;
     }
   }
 
   private loadTemplate(templateName: string): string {
     try {
-      const templatePath = join(this.templatesDir, `${templateName}.html`);
+      const templatePath = join(this.templatesDir, `${templateName}.ejs`);
       console.log('Template directory:', this.templatesDir);
       console.log('Template path:', templatePath);
       console.log('Current working directory:', process.cwd());
@@ -161,6 +230,42 @@ export class MailerService {
     return await this.sendEmail({
       to: email,
       subject: 'Your Verification Code',
+      html,
+    });
+  }
+
+  async sendWelcomeInstructorEmail(
+    email: string,
+    firstName: string,
+  ): Promise<boolean> {
+    const template = this.loadTemplate('welcome-instructor');
+    const html = this.replacePlaceholders(template, {
+      firstName,
+      dashboardUrl: `${process.env.FRONTEND_URL || 'http://localhost:4200'}/dashboard`,
+      helpUrl: `${process.env.FRONTEND_URL || 'http://localhost:4200'}/help/instructor`,
+      supportEmail: process.env.SUPPORT_EMAIL || 'support@example.com',
+    });
+    return await this.sendEmail({
+      to: email,
+      subject: '🎓 Welcome to Our Teaching Platform!',
+      html,
+    });
+  }
+
+  async sendWelcomeStudentEmail(
+    email: string,
+    firstName: string,
+  ): Promise<boolean> {
+    const template = this.loadTemplate('welcome-student');
+    const html = this.replacePlaceholders(template, {
+      firstName,
+      coursesUrl: `${process.env.FRONTEND_URL || 'http://localhost:4200'}/courses`,
+      helpUrl: `${process.env.FRONTEND_URL || 'http://localhost:4200'}/help/student`,
+      supportEmail: process.env.SUPPORT_EMAIL || 'support@example.com',
+    });
+    return await this.sendEmail({
+      to: email,
+      subject: '🎓 Welcome to Our Learning Platform!',
       html,
     });
   }

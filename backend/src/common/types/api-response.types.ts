@@ -14,6 +14,12 @@ export interface UserResponse {
   lastName: string;
   role: string;
   isVerified: boolean;
+  /** Optional 'about' text; may be null */
+  about?: string | null;
+  /** Profile completion percentage */
+  profileProgress?: number;
+  /** User creation date */
+  createdAt: Date;
 }
 
 export interface UserWithTokenResponse {

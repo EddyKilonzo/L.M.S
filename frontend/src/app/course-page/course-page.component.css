@@ -1,0 +1,112 @@
+:root {
+    --primary: #4F46E5;
+    --secondary: #F9FAFB;
+    --dark: #1F2937;
+    --dark-gray: #6B7280;
+    --border-color: #E5E7EB;
+    --theme-color: #4F46E5;
+    --theme-dark: #4338CA;
+    --card-bg: #FFFFFF;
+    --text-dark: #111827;
+    --background-color: #F3F4F6;
+}
+
+.text-primary {
+    color: var(--primary);
+}
+
+.bg-primary {
+    background-color: var(--primary);
+}
+
+.border-primary {
+    border-color: var(--primary);
+}
+
+.bg-secondary {
+    background-color: var(--secondary);
+}
+
+.text-dark {
+    color: var(--dark);
+}
+
+.text-dark-gray {
+    color: var(--dark-gray);
+}
+
+.border-border-color {
+    border-color: var(--border-color);
+}
+
+.bg-theme {
+    background-color: var(--theme-color);
+}
+
+.text-theme {
+    color: var(--theme-color);
+}
+
+.border-theme {
+    border-color: var(--theme-color);
+}
+
+.hover\:bg-theme-dark:hover {
+    background-color: var(--theme-dark);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.btn-primary {
+    background-color: var(--theme-color);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--theme-dark);
+}
+
+.btn-secondary {
+    background-color: var(--card-bg);
+    color: var(--text-dark);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--background-color);
+    border-color: var(--theme-color);
+    color: var(--theme-color);
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+.transition-transform {
+    transition: transform 0.3s ease-in-out;
+}
+
+.text-yellow-500 {
+    color: #F59E0B;
+}

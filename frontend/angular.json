@@ -30,6 +30,11 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "externalDependencies": [
+              "tailwindcss/base",
+              "tailwindcss/components",
+              "tailwindcss/utilities"
             ]
           },
           "configurations": {
@@ -58,6 +63,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"

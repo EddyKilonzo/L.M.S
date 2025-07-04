@@ -1,0 +1,190 @@
+<div class="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-50">
+  <!-- Navbar -->
+  <app-shared-navbar></app-shared-navbar>
+
+  <div class="flex-1 flex items-center justify-center p-4 my-8">
+    <div class="w-full max-w-4xl mx-auto flex bg-white shadow-2xl rounded-2xl overflow-hidden">
+      <!-- Left: Image -->
+      <div class="hidden md:block w-1/2 relative">
+        <img src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Person learning online" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
+      </div>
+      
+      <!-- Right: Form -->
+      <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-center">
+        <div class="max-w-sm mx-auto w-full">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-1">Join Our Community</h2>
+            <p class="text-gray-600 text-sm">Start your learning journey today</p>
+          </div>
+          
+          <form #signupForm="ngForm" (ngSubmit)="onSubmit(signupForm)" class="space-y-4">
+            <!-- Role Selection -->
+            <div>
+              <label class="text-sm font-semibold text-gray-700 mb-2 block">I want to join as:</label>
+              <div class="flex gap-2">
+                <label class="cursor-pointer group">
+                  <input type="radio" name="role" value="STUDENT" [(ngModel)]="model.role" class="sr-only" />
+                  <div class="flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-all duration-300 group-hover:shadow-sm" 
+                       [class.border-blue-500]="model.role === 'STUDENT'"
+                       [class.bg-blue-50]="model.role === 'STUDENT'"
+                       [class.border-gray-200]="model.role !== 'STUDENT'"
+                       [class.group-hover:border-blue-300]="model.role !== 'STUDENT'">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <span class="font-medium text-sm text-gray-700">Student</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer group">
+                  <input type="radio" name="role" value="INSTRUCTOR" [(ngModel)]="model.role" class="sr-only" />
+                  <div class="flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-all duration-300 group-hover:shadow-sm"
+                       [class.border-blue-500]="model.role === 'INSTRUCTOR'"
+                       [class.bg-blue-50]="model.role === 'INSTRUCTOR'"
+                       [class.border-gray-200]="model.role !== 'INSTRUCTOR'"
+                       [class.group-hover:border-blue-300]="model.role !== 'INSTRUCTOR'">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    <span class="font-medium text-sm text-gray-700">Instructor</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Name Fields -->
+                          <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="text-sm font-semibold text-gray-700 mb-1 block">First Name</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                    </div>
+                    <input type="text" name="firstName" [(ngModel)]="model.firstName" required 
+                           placeholder="John" 
+                           class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
+                  </div>
+                </div>
+                <div>
+                  <label class="text-sm font-semibold text-gray-700 mb-1 block">Last Name</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                    </div>
+                    <input type="text" name="lastName" [(ngModel)]="model.lastName" required 
+                           placeholder="Doe" 
+                           class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
+                  </div>
+                </div>
+              </div>
+
+            <!-- Email Field -->
+            <div>
+              <label class="text-sm font-semibold text-gray-700 mb-1 block">Email Address</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <input type="email" name="email" [(ngModel)]="model.email" required 
+                       placeholder="john.doe@example.com" 
+                       class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
+              </div>
+            </div>
+
+            <!-- Password Fields -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-semibold text-gray-700 mb-1 block">Password</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                  </div>
+                  <input type="password" name="password" [(ngModel)]="model.password" required 
+                         placeholder="••••••••" 
+                         class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
+                </div>
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-gray-700 mb-1 block">Confirm Password</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                  </div>
+                  <input type="password" name="confirmPassword" [(ngModel)]="model.confirmPassword" required 
+                         placeholder="••••••••" 
+                         class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" />
+                </div>
+              </div>
+            </div>
+
+
+
+            <!-- Submit Button -->
+            <button type="submit" 
+                    [disabled]="isLoading"
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-bold text-base flex items-center justify-center gap-3 hover:from-blue-700 hover:to-blue-800 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+              <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{{ isLoading ? 'Creating Account...' : 'Create Account' }}</span>
+              <svg *ngIf="!isLoading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+              </svg>
+            </button>
+          </form>
+          
+          <!-- Divider -->
+          <div class="flex items-center my-6">
+            <div class="flex-1 border-t border-gray-300"></div>
+            <span class="px-4 text-gray-500 text-sm font-medium">or continue with</span>
+            <div class="flex-1 border-t border-gray-300"></div>
+          </div>
+          
+          <!-- Social Login Buttons -->
+          <div class="grid grid-cols-3 gap-3">
+            <button class="flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg py-2.5 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200">
+              <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </button>
+            <button class="flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg py-2.5 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200">
+              <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            </button>
+            <button class="flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg py-2.5 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200">
+              <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#F25022" d="M10.032 10.032H.5V.5h9.532v9.532zm0 10.468H.5v-9.536h9.532v9.536zM20.5 10.032h-9.536V.5H20.5v9.532zm0 10.468h-9.536v-9.536H20.5v9.536z"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Login Link -->
+          <div class="text-center mt-6">
+            <p class="text-gray-600 text-sm">
+              Already have an account? 
+              <a routerLink="/login" class="text-blue-600 font-semibold hover:text-blue-700 transition-colors duration-200">Sign in</a>
+            </p>
+            <p class="text-gray-600 text-sm mt-2">
+              <a routerLink="/forgot-password" class="text-blue-600 hover:text-blue-700 transition-colors duration-200">Forgot your password?</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

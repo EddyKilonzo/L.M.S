@@ -19,6 +19,10 @@ model User {
   password        String
   firstName       String
   lastName        String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  about           String?
+  profileProgress Int           @default(0)
   role            Role           @default(STUDENT) // Admin, Instructor, Student
   isVerified      Boolean        @default(false)
   resetPasswordToken String?

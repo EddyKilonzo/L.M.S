@@ -67,4 +67,20 @@ export class AuthController {
   async verifyCode(@Body() dto: VerifyCodeDto) {
     return await this.authService.verifyCode(dto.email, dto.code);
   }
+
+  @Post('resend-verification')
+  @ApiOperation({ summary: 'Resend verification code' })
+  @ApiResponse({ status: 200, description: 'Verification code resent' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async resendVerificationCode(@Body() body: { email: string }) {
+    return await this.authService.resendVerificationCode(body.email);
+  }
+
+  @Get('check-status')
+  @ApiOperation({ summary: 'Check user verification status' })
+  @ApiResponse({ status: 200, description: 'User status retrieved' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async checkUserStatus(@Query('email') email: string) {
+    return await this.authService.checkUserStatus(email);
+  }
 }

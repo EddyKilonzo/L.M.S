@@ -1,0 +1,620 @@
+/* Modern, stylish profile page with gray/neutral theme */
+
+.profile-page {
+  font-family: 'Inter', Arial, sans-serif;
+  gap: 0;
+  align-items: flex-start;
+}
+
+.profile-page aside {
+  min-width: 260px;
+  max-width: 320px;
+  box-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.18), 0 1.5px 4px 0 rgba(31, 41, 55, 0.08);
+  border-radius: 1rem;
+  position: sticky;
+  top: 2rem;
+  height: fit-content;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.profile-page aside::-webkit-scrollbar {
+  width: 6px;
+}
+
+.profile-page aside::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.profile-page aside::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 3px;
+}
+
+.profile-page aside::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
+
+.profile-page main {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+input[disabled], .bg-gray-100 {
+  background: #f3f4f6 !important;
+  color: #6b7280;
+}
+
+input, select, textarea {
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #1f2937;
+  box-shadow: 0 2px 8px 0 rgba(31, 41, 55, 0.08);
+}
+
+button:active {
+  opacity: 0.95;
+}
+
+aside nav a {
+  transition: all 0.2s;
+}
+
+aside nav a:hover {
+  background: #f3f4f6;
+  border-left: 4px solid #1f2937 !important;
+  box-shadow: 0 2px 8px 0 rgba(31, 41, 55, 0.08);
+}
+
+/* Enhanced Profile Image Styling */
+.profile-image-container {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.profile-image-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 40px 0 rgba(31, 41, 55, 0.25);
+}
+
+.profile-image-container::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #6b7280, #374151, #6b7280);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.profile-image-container:hover::before {
+  opacity: 1;
+}
+
+/* Profile Image Upload Overlay */
+.profile-image-overlay {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(2px);
+}
+
+.profile-image-overlay svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Progress Bar Animation */
+.progress-bar {
+  background: linear-gradient(90deg, #6b7280, #374151);
+  animation: progressPulse 2s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Form Input Enhancements */
+.form-input {
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px 0 rgba(31, 41, 55, 0.15);
+}
+
+/* Save Button Enhancements */
+.save-button {
+  background: linear-gradient(135deg, #374151, #1f2937);
+  transition: all 0.3s ease;
+}
+
+.save-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1f2937, #111827);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 41, 55, 0.3);
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Account Details Cards */
+.account-card {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.account-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px 0 rgba(31, 41, 55, 0.1);
+}
+
+/* Status Badge */
+.status-badge {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border: 1px solid #86efac;
+}
+
+/* Profile image hover overlay */
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1 !important;
+}
+
+.group .group-hover\:opacity-100 {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Card and container shadows */
+.bg-white, .bg-gray-50 {
+  box-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.18), 0 1.5px 4px 0 rgba(31, 41, 55, 0.08);
+}
+
+.bg-white {
+  border-radius: 1rem;
+}
+
+.bg-gray-50 {
+  border-radius: 1rem;
+}
+
+/* Main content card alignment */
+.profile-page main .bg-white {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 0;
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #374151;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Sidebar tab styles - Now using Tailwind utility classes */
+/* Old styles removed as we're using Tailwind classes for consistent theming */
+
+/* Course Card Styles */
+.course-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transform: transition-transform duration-300;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+}
+
+.course-image-wrapper {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.course-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.course-card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.course-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.course-card:hover img {
+  transform: scale(1.1);
+}
+
+.course-card .course-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.course-card .course-instructor {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.course-card .course-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.course-card .star-icon {
+  color: #fbbf24;
+  width: 1rem;
+  height: 1rem;
+}
+
+.course-card .go-to-btn {
+  margin-top: auto;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.course-card .go-to-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Courses Controls - Enhanced */
+.courses-controls {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+.courses-controls input,
+.courses-controls select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background: white;
+  color: #374151;
+}
+
+.courses-controls input:focus,
+.courses-controls select:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.courses-controls input::placeholder {
+  color: #9ca3af;
+}
+
+.courses-controls .filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.courses-controls .filter-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.courses-controls .filter-btn svg {
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.courses-controls .filter-btn:hover svg {
+  transform: rotate(180deg);
+}
+
+/* Pagination */
+.courses-pagination button {
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+  color: #64748b;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  margin: 0 0.15rem;
+  padding: 0.5rem 1rem;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.courses-pagination button.active,
+.courses-pagination button:focus {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  outline: none;
+}
+.courses-pagination button:hover:not(:disabled):not(.active) {
+  background: #f1f5f9;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+.courses-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Teachers Section Styles */
+.teacher-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transform: transition-transform duration-300;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+}
+
+.teacher-image-wrapper {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.teacher-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.teacher-card-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.teacher-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.teacher-card:hover img {
+  transform: scale(1.1);
+}
+
+.teacher-card .teacher-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.teacher-card .teacher-title {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-card .teacher-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.teacher-card .star-icon {
+  color: #fbbf24;
+  width: 1rem;
+  height: 1rem;
+}
+
+.teacher-card .send-message-btn {
+  margin-top: auto;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.teacher-card .send-message-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Teachers Controls - Enhanced */
+.teachers-controls {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+.teachers-controls input,
+.teachers-controls select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background: white;
+  color: #374151;
+}
+
+.teachers-controls input:focus,
+.teachers-controls select:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.teachers-controls input::placeholder {
+  color: #9ca3af;
+}
+
+.teachers-controls .filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.teachers-controls .filter-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.teachers-controls .filter-btn svg {
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.teachers-controls .filter-btn:hover svg {
+  transform: rotate(180deg);
+}
+
+/* Teachers Pagination */
+.teachers-pagination button {
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+  color: #64748b;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  margin: 0 0.15rem;
+  padding: 0.5rem 1rem;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+
+.teachers-pagination button.active,
+.teachers-pagination button:focus {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  outline: none;
+}
+
+.teachers-pagination button:hover:not(:disabled):not(.active) {
+  background: #f1f5f9;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+.teachers-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive grid tweaks */
+@media (max-width: 900px) {
+  .course-card {
+    min-height: 320px;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .profile-page {
+    flex-direction: column;
+  }
+  .profile-page aside {
+    width: 100%;
+    max-width: none;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 2rem;
+    border-radius: 1rem 1rem 0 0;
+    margin: 0 0 1rem 0;
+    position: static;
+    height: auto;
+    max-height: none;
+  }
+  .profile-page main {
+    padding: 1rem;
+    margin: 0;
+    align-items: stretch;
+  }
+  
+  /* Mobile profile image adjustments */
+  .profile-image-container {
+    width: 120px !important;
+    height: 120px !important;
+  }
+} 

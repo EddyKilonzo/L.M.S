@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedNavbar } from '../shared/navbar.component';
+import { SharedNavbar } from '../shared/navbar/navbar.component';
 import { trigger, transition, style, animate, query, group, animateChild } from '@angular/animations';
 
 @Component({
@@ -38,7 +38,7 @@ import { trigger, transition, style, animate, query, group, animateChild } from 
     ])
   ]
 })
-export class LandingPage implements OnInit, OnDestroy {
+export class LandingPage implements OnInit, OnDestroy, AfterViewInit {
   banners = [
     {
       img: '/images/photo-1513258496099-48168024aec0-removebg-preview.png',
@@ -89,16 +89,96 @@ export class LandingPage implements OnInit, OnDestroy {
       accentColor: 'indigo'
     },
   ];
+
+  // Stats counter properties
+  stats = [
+    { target: 250, current: 0, label: 'Courses by our best mentors', suffix: '+' },
+    { target: 1000, current: 0, label: 'Students enrolled', suffix: '+' },
+    { target: 15, current: 0, label: 'Expert instructors', suffix: '+' },
+    { target: 2400, current: 0, label: 'Happy learners', suffix: '+' }
+  ];
+
   currentSlide = 0;
   previousSlide = 0;
   private intervalId: any;
+  private statsObserver: IntersectionObserver | null = null;
+  private counterIntervals: any[] = [];
+  private countersStarted = false;
 
   ngOnInit() {
     this.startAutoSlide();
   }
 
+  ngAfterViewInit() {
+    this.setupStatsObserver();
+  }
+
   ngOnDestroy() {
     this.stopAutoSlide();
+    this.cleanupStatsObserver();
+  }
+
+  setupStatsObserver() {
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      this.statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !this.countersStarted) {
+            this.startCounters();
+            this.countersStarted = true;
+          }
+        });
+      }, { threshold: 0.3 });
+
+      // Observe the stats section
+      const statsSection = document.querySelector('#stats-section');
+      if (statsSection) {
+        this.statsObserver.observe(statsSection);
+      }
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      setTimeout(() => {
+        this.startCounters();
+      }, 1000);
+    }
+  }
+
+  cleanupStatsObserver() {
+    if (this.statsObserver) {
+      this.statsObserver.disconnect();
+    }
+    this.counterIntervals.forEach(interval => clearInterval(interval));
+  }
+
+  startCounters() {
+    console.log('Starting counters...');
+    
+    // Clear any existing intervals
+    this.counterIntervals.forEach(interval => clearInterval(interval));
+    this.counterIntervals = [];
+    
+    // Reset counters to 0
+    this.stats.forEach(stat => {
+      stat.current = 0;
+    });
+    
+    this.stats.forEach((stat, index) => {
+      const duration = 10000; // 10 seconds - very slow for comfortable reading
+      const steps = 120; // More steps for ultra-smooth animation
+      const increment = stat.target / steps;
+      let currentStep = 0;
+
+      const interval = setInterval(() => {
+        currentStep++;
+        stat.current = Math.min(increment * currentStep, stat.target);
+        
+        if (currentStep >= steps) {
+          stat.current = stat.target;
+          clearInterval(interval);
+        }
+      }, duration / steps);
+
+      this.counterIntervals.push(interval);
+    });
   }
 
   startAutoSlide() {

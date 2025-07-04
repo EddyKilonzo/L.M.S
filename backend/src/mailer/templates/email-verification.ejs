@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset</title>
+    <title>Verify Your Email</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +22,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            background-color: #2563eb;
             color: white;
             padding: 40px 30px;
             text-align: center;
@@ -35,14 +35,14 @@
         .content {
             padding: 40px 30px;
         }
-        .greeting-text {
+        .welcome-text {
             font-size: 18px;
             margin-bottom: 20px;
             color: #555;
         }
-        .reset-button {
+        .verification-button {
             display: inline-block;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            background-color: #2563eb;
             color: white;
             padding: 15px 30px;
             text-decoration: none;
@@ -51,15 +51,9 @@
             margin: 20px 0;
             transition: transform 0.2s;
         }
-        .reset-button:hover {
+        .verification-button:hover {
             transform: translateY(-2px);
-        }
-        .warning-box {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            background-color: #1e40af;
         }
         .footer {
             background-color: #f8f9fa;
@@ -69,7 +63,7 @@
             font-size: 14px;
         }
         .support-link {
-            color: #ff6b6b;
+            color: #2563eb;
             text-decoration: none;
         }
         .support-link:hover {
@@ -80,40 +74,38 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔐 Password Reset Request</h1>
+            <h1>🎓 Welcome to Our E-Learning Platform!</h1>
         </div>
         
         <div class="content">
-            <p class="greeting-text">Hi {{firstName}},</p>
+            <p class="welcome-text">Hi {{firstName}},</p>
             
-            <p>We received a request to reset your password for your e-learning account.</p>
+            <p>Thank you for joining our e-learning community! We're excited to have you on board.</p>
             
-            <p>Click the button below to create a new password:</p>
+            <p>To get started and access all our amazing courses, please verify your email address by clicking the button below:</p>
             
             <div style="text-align: center;">
-                <a href="{{resetUrl}}" class="reset-button">
-                    🔑 Reset Password
+                <a href="{{verificationUrl}}" class="verification-button">
+                    ✅ Verify Email Address
                 </a>
             </div>
             
             <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #ff6b6b;">{{resetUrl}}</p>
+            <p style="word-break: break-all; color: #2563eb;">{{verificationUrl}}</p>
             
-            <div class="warning-box">
-                <p><strong>⚠️ Important Security Notice:</strong></p>
-                <ul>
-                    <li>This link will expire in <strong>1 hour</strong></li>
-                    <li>If you didn't request this password reset, please ignore this email</li>
-                    <li>Your current password will remain unchanged until you complete the reset</li>
-                </ul>
-            </div>
+            <p><strong>What happens next?</strong></p>
+            <ul>
+                <li>After verification, you'll be able to log in to your account</li>
+                <li>Browse and enroll in courses</li>
+                <li>Track your learning progress</li>
+                <li>Earn certificates upon completion</li>
+            </ul>
             
-            <p><strong>Need help?</strong></p>
-            <p>If you're having trouble resetting your password, please contact our support team.</p>
+            <p>If you didn't create an account with us, please ignore this email.</p>
         </div>
         
         <div class="footer">
-            <p>Questions? Contact us at <a href="mailto:{{supportEmail}}" class="support-link">{{supportEmail}}</a></p>
+            <p>Need help? Contact us at <a href="mailto:{{supportEmail}}" class="support-link">{{supportEmail}}</a></p>
             <p>&copy; 2024 E-Learning Platform. All rights reserved.</p>
         </div>
     </div>
