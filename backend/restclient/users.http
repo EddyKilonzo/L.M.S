@@ -1,0 +1,43 @@
+### Users Endpoints Tests
+
+@baseUrl = http://localhost:3000
+@usersUrl = {{baseUrl}}/users
+
+### Note: These endpoints require authentication
+### First login to get access token, then use it in Authorization header
+
+### 1. Get all users (requires ADMIN role)
+GET {{usersUrl}}
+Authorization: Bearer your-access-token-here
+
+### 2. Get user by ID
+GET {{usersUrl}}/user-id-here
+Authorization: Bearer your-access-token-here
+
+### 3. Update user profile
+PATCH {{usersUrl}}/user-id-here
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "firstName": "Updated",
+  "lastName": "Name",
+  "email": "updated@example.com"
+}
+
+### 4. Delete user
+DELETE {{usersUrl}}/user-id-here
+Authorization: Bearer your-access-token-here
+
+### 5. Get user by ID (non-existent user)
+GET {{usersUrl}}/non-existent-id
+Authorization: Bearer your-access-token-here
+
+### 6. Update user with invalid data
+PATCH {{usersUrl}}/user-id-here
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "email": "invalid-email"
+} 

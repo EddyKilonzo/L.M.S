@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  password        String
+  firstName       String
+  lastName        String
+  role            Role           @default(STUDENT) // Admin, Instructor, Student
+  isVerified      Boolean        @default(false)
+  resetPasswordToken String?
+  emailVerificationToken String?
+  verificationCode String?
+  verificationCodeExpiry DateTime?
+
+  coursesEnrolled CourseEnrollment[]
+  coursesTaught   Course[]
+  reviews         CourseReview[]
+  quizzes         QuizAttempt[]
+  discussions     DiscussionPost[]
+  messagesSent    Message[]      @relation("SenderMessages")
+  messagesReceived Message[]      @relation("ReceiverMessages")
+  lessonCompletions StudentLessonCompletion[]
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+model Course {
+  id               String          @id @default(uuid())
+  title            String
+  description      String
+  objectives       String[]
+  prerequisites    String[]
+  category         CourseCategory  @relation(fields: [categoryId], references: [id])
+  categoryId       String
+  difficulty       Difficulty
+  instructor       User            @relation(fields: [instructorId], references: [id])
+  instructorId     String
+  price            Float
+  imageUrl         String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  modules          CourseModule[]
+  enrollments      CourseEnrollment[]
+  reviews          CourseReview[]
+  quizzes          Quiz[]
+  discussions      CourseDiscussion[]
+}
+
+model CourseCategory {
+  id    String @id @default(uuid())
+  name  String @unique
+  courses Course[]
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model CourseModule {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  order       Int
+  course      Course   @relation(fields: [courseId], references: [id])
+  courseId    String
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  contentType String // e.g., 'video', 'pdf', 'text'
+  contentUrl  String?  // URL to video, PDF, or text content
+  order       Int
+  module      CourseModule @relation(fields: [moduleId], references: [id])
+  moduleId    String
+  completedBy StudentLessonCompletion[]
+}
+
+model StudentLessonCompletion {
+  id        String   @id @default(uuid())
+  student   User     @relation(fields: [studentId], references: [id])
+  studentId String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  lessonId  String
+  completedAt DateTime @default(now())
+}
+
+model CourseEnrollment {
+  id        String   @id @default(uuid())
+  student   User     @relation(fields: [studentId], references: [id])
+  studentId String
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  String
+  enrolledAt DateTime @default(now())
+  progress  Float    @default(0) // 0-100%
+  completed Boolean  @default(false)
+  completedAt DateTime?
+  certificateUrl String?
+}
+
+model CourseReview {
+  id        String   @id @default(uuid())
+  rating    Int      // 1-5
+  comment   String?
+  student   User     @relation(fields: [studentId], references: [id])
+  studentId String
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  String
+  createdAt DateTime @default(now())
+}
+
+model Quiz {
+  id        String    @id @default(uuid())
+  title     String
+  description String?
+  course    Course    @relation(fields: [courseId], references: [id])
+  courseId  String
+  timeLimit Int?      // in minutes
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+}
+
+model QuizQuestion {
+  id        String   @id @default(uuid())
+  text      String
+  type      QuestionType // MCQ, Text, etc.
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    String
+  options   String[] // For MCQ
+  correctAnswer String // For MCQ, or expected text for Text type
+}
+
+enum QuestionType {
+  MCQ
+  TEXT
+}
+
+model QuizAttempt {
+  id        String   @id @default(uuid())
+  student   User     @relation(fields: [studentId], references: [id])
+  studentId String
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    String
+  score     Float?
+  submittedAt DateTime @default(now())
+  answers   Json // Store user's answers as JSON
+  isCompleted Boolean @default(false)
+}
+
+// Optional Discussion & Communication
+model CourseDiscussion {
+  id        String   @id @default(uuid())
+  title     String
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  String
+  posts     DiscussionPost[]
+}
+
+model DiscussionPost {
+  id        String   @id @default(uuid())
+  content   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  discussion CourseDiscussion @relation(fields: [discussionId], references: [id])
+  discussionId String
+  parentPost DiscussionPost? @relation("ParentChildPosts", fields: [parentPostId], references: [id])
+  parentPostId String?
+  replies   DiscussionPost[] @relation("ParentChildPosts")
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  sender    User     @relation("SenderMessages", fields: [senderId], references: [id])
+  senderId  String
+  receiver  User     @relation("ReceiverMessages", fields: [receiverId], references: [id])
+  receiverId String
+  content   String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+}

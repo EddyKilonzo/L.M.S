@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Your Course!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .course-title {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .start-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+        .start-button:hover {
+            transform: translateY(-2px);
+        }
+        .features-list {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .features-list h3 {
+            margin-top: 0;
+            color: #4facfe;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .support-link {
+            color: #4facfe;
+            text-decoration: none;
+        }
+        .support-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Welcome to Your New Course!</h1>
+        </div>
+        
+        <div class="content">
+            <p class="greeting-text">Hi {{firstName}},</p>
+            
+            <p>Congratulations! You've successfully enrolled in:</p>
+            
+            <div class="course-title">
+                📚 {{courseTitle}}
+            </div>
+            
+            <p>You're all set to start your learning journey! Here's what you can do next:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{courseUrl}}" class="start-button">
+                    🚀 Start Learning Now
+                </a>
+            </div>
+            
+            <div class="features-list">
+                <h3>✨ What's included in your course:</h3>
+                <ul>
+                    <li>📖 Comprehensive course materials</li>
+                    <li>🎥 Video lessons and tutorials</li>
+                    <li>📝 Interactive quizzes and assessments</li>
+                    <li>📊 Progress tracking</li>
+                    <li>🏆 Certificate upon completion</li>
+                    <li>💬 Access to course community</li>
+                </ul>
+            </div>
+            
+            <p><strong>Pro Tips:</strong></p>
+            <ul>
+                <li>Set aside dedicated time each day for learning</li>
+                <li>Take notes and complete all assignments</li>
+                <li>Engage with other learners in the community</li>
+                <li>Don't hesitate to ask questions if you need help</li>
+            </ul>
+            
+            <p>Ready to begin? Click the button above to access your course dashboard and start learning!</p>
+        </div>
+        
+        <div class="footer">
+            <p>Need help? Contact us at <a href="mailto:{{supportEmail}}" class="support-link">{{supportEmail}}</a></p>
+            <p>&copy; 2024 E-Learning Platform. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html> 

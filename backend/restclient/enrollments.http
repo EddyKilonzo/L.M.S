@@ -1,0 +1,59 @@
+### Enrollments Endpoints Tests
+
+@baseUrl = http://localhost:3000
+@enrollmentsUrl = {{baseUrl}}/enrollments
+
+### Note: These endpoints require authentication
+### First login to get access token, then use it in Authorization header
+
+### 1. Enroll a student in a course
+POST {{enrollmentsUrl}}/enroll/course-id-here
+Authorization: Bearer your-access-token-here
+
+### 2. Enroll another student in the same course
+POST {{enrollmentsUrl}}/enroll/course-id-here
+Authorization: Bearer your-access-token-here
+
+### 3. Get enrollments for a student
+GET {{enrollmentsUrl}}/student/student-id-here
+Authorization: Bearer your-access-token-here
+
+### 4. Get enrollments for a course
+GET {{enrollmentsUrl}}/course/course-id-here
+Authorization: Bearer your-access-token-here
+
+### 5. Update enrollment progress
+PATCH {{enrollmentsUrl}}/enrollment-id-here/progress
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "progress": 50,
+  "completedLessons": ["lesson-id-1", "lesson-id-2"],
+  "currentLesson": "lesson-id-3"
+}
+
+### 6. Mark lesson as completed
+POST {{enrollmentsUrl}}/lesson/lesson-id-here/complete
+Authorization: Bearer your-access-token-here
+
+### 7. Try to enroll in non-existent course
+POST {{enrollmentsUrl}}/enroll/non-existent-course-id
+Authorization: Bearer your-access-token-here
+
+### 8. Get enrollments for non-existent student
+GET {{enrollmentsUrl}}/student/non-existent-student-id
+Authorization: Bearer your-access-token-here
+
+### 9. Get enrollments for non-existent course
+GET {{enrollmentsUrl}}/course/non-existent-course-id
+Authorization: Bearer your-access-token-here
+
+### 10. Update non-existent enrollment progress
+PATCH {{enrollmentsUrl}}/non-existent-enrollment-id/progress
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "progress": 25
+} 

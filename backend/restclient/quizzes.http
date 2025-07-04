@@ -1,0 +1,123 @@
+### Quizzes Endpoints Tests
+
+@baseUrl = http://localhost:3000
+@quizzesUrl = {{baseUrl}}/quizzes
+
+### Note: These endpoints require authentication
+### First login to get access token, then use it in Authorization header
+
+### 1. Create a quiz for a course
+POST {{quizzesUrl}}
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "HTML Basics Quiz",
+  "description": "Test your knowledge of HTML fundamentals",
+  "courseId": "course-id-here",
+  "timeLimit": 30,
+  "passingScore": 70,
+  "questions": [
+    {
+      "question": "What does HTML stand for?",
+      "type": "MULTIPLE_CHOICE",
+      "options": [
+        "Hyper Text Markup Language",
+        "High Tech Modern Language",
+        "Home Tool Markup Language",
+        "Hyperlink and Text Markup Language"
+      ],
+      "correctAnswer": 0,
+      "points": 10
+    },
+    {
+      "question": "Which tag is used for creating a paragraph?",
+      "type": "MULTIPLE_CHOICE",
+      "options": ["<p>", "<paragraph>", "<text>", "<div>"],
+      "correctAnswer": 0,
+      "points": 10
+    }
+  ]
+}
+
+### 2. Create another quiz
+POST {{quizzesUrl}}
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "CSS Fundamentals Quiz",
+  "description": "Test your CSS knowledge",
+  "courseId": "course-id-here",
+  "timeLimit": 45,
+  "passingScore": 75,
+  "questions": [
+    {
+      "question": "What does CSS stand for?",
+      "type": "MULTIPLE_CHOICE",
+      "options": [
+        "Cascading Style Sheets",
+        "Computer Style Sheets",
+        "Creative Style Sheets",
+        "Colorful Style Sheets"
+      ],
+      "correctAnswer": 0,
+      "points": 15
+    }
+  ]
+}
+
+### 3. Get quizzes for a course
+GET {{quizzesUrl}}/course/course-id-here
+
+### 4. Get quiz by ID
+GET {{quizzesUrl}}/quiz-id-here
+
+### 5. Submit quiz attempt
+POST {{quizzesUrl}}/quiz-id-here/submit
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "question-id-1",
+      "selectedAnswer": 0
+    },
+    {
+      "questionId": "question-id-2",
+      "selectedAnswer": 0
+    }
+  ],
+  "timeSpent": 25
+}
+
+### 6. Get quiz attempts for a user
+GET {{quizzesUrl}}/quiz-id-here/attempts
+Authorization: Bearer your-access-token-here
+
+### 7. Get non-existent quiz
+GET {{quizzesUrl}}/non-existent-quiz-id
+
+### 8. Submit quiz with invalid data
+POST {{quizzesUrl}}/quiz-id-here/submit
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "answers": [],
+  "timeSpent": -5
+}
+
+### 9. Create quiz with invalid data
+POST {{quizzesUrl}}
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "",
+  "description": "Invalid quiz",
+  "courseId": "non-existent-course-id",
+  "timeLimit": -10,
+  "passingScore": 150
+} 

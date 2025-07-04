@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Congratulations! Course Completed</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .course-title {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .certificate-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+        .certificate-button:hover {
+            transform: translateY(-2px);
+        }
+        .achievement-box {
+            background-color: #fff3cd;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .next-steps {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .next-steps h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .support-link {
+            color: #ffd700;
+            text-decoration: none;
+        }
+        .support-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Congratulations! You Did It!</h1>
+        </div>
+        
+        <div class="content">
+            <p class="greeting-text">Hi {{firstName}},</p>
+            
+            <p>🎉 <strong>Amazing work!</strong> You've successfully completed:</p>
+            
+            <div class="course-title">
+                📚 {{courseTitle}}
+            </div>
+            
+            <div class="achievement-box">
+                <h2>🌟 Achievement Unlocked!</h2>
+                <p>You've demonstrated dedication, persistence, and a commitment to learning. This is a significant milestone in your educational journey!</p>
+            </div>
+            
+            <p>Your certificate of completion is ready! Click the button below to download it:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{certificateUrl}}" class="certificate-button">
+                    📜 Download Certificate
+                </a>
+            </div>
+            
+            <div class="next-steps">
+                <h3>🚀 What's Next?</h3>
+                <ul>
+                    <li>📖 Share your certificate on LinkedIn and other professional networks</li>
+                    <li>🎯 Apply your new skills in real-world projects</li>
+                    <li>📚 Explore more courses to continue your learning journey</li>
+                    <li>💼 Update your resume with your new certification</li>
+                    <li>🤝 Connect with other learners in our community</li>
+                </ul>
+            </div>
+            
+            <p><strong>Keep Learning:</strong></p>
+            <p>Remember, learning is a lifelong journey. We have many more courses waiting for you to explore. Your next achievement is just around the corner!</p>
+            
+            <p>Thank you for choosing our platform for your learning journey. We're proud to have been part of your success!</p>
+        </div>
+        
+        <div class="footer">
+            <p>Questions about your certificate? Contact us at <a href="mailto:{{supportEmail}}" class="support-link">{{supportEmail}}</a></p>
+            <p>&copy; 2024 E-Learning Platform. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html> 

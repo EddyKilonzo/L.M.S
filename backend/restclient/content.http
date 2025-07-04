@@ -1,0 +1,103 @@
+### Content Endpoints Tests
+
+@baseUrl = http://localhost:3000
+@contentUrl = {{baseUrl}}/content
+
+### Note: These endpoints require authentication
+### First login to get access token, then use it in Authorization header
+
+### 1. Create a module for a course
+POST {{contentUrl}}/modules
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "HTML Basics",
+  "description": "Introduction to HTML elements and structure",
+  "courseId": "course-id-here",
+  "order": 1
+}
+
+### 2. Create another module
+POST {{contentUrl}}/modules
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "CSS Styling",
+  "description": "Learn CSS properties and styling techniques",
+  "courseId": "course-id-here",
+  "order": 2
+}
+
+### 3. Create a lesson for a module
+POST {{contentUrl}}/lessons
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "HTML Document Structure",
+  "content": "<h1>Welcome to HTML</h1><p>This is a paragraph.</p>",
+  "moduleId": "module-id-here",
+  "order": 1,
+  "duration": 15,
+  "type": "VIDEO"
+}
+
+### 4. Create another lesson
+POST {{contentUrl}}/lessons
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "CSS Selectors",
+  "content": "Learn about CSS selectors and specificity",
+  "moduleId": "module-id-here",
+  "order": 2,
+  "duration": 20,
+  "type": "TEXT"
+}
+
+### 5. Get modules for a course
+GET {{contentUrl}}/courses/course-id-here/modules
+
+### 6. Get module by ID
+GET {{contentUrl}}/modules/module-id-here
+
+### 7. Get lesson by ID
+GET {{contentUrl}}/lessons/lesson-id-here
+
+### 8. Update module
+PATCH {{contentUrl}}/modules/module-id-here
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "Updated Module Title",
+  "description": "Updated module description"
+}
+
+### 9. Update lesson
+PATCH {{contentUrl}}/lessons/lesson-id-here
+Authorization: Bearer your-access-token-here
+Content-Type: application/json
+
+{
+  "title": "Updated Lesson Title",
+  "content": "Updated lesson content",
+  "duration": 25
+}
+
+### 10. Delete module
+DELETE {{contentUrl}}/modules/module-id-here
+Authorization: Bearer your-access-token-here
+
+### 11. Delete lesson
+DELETE {{contentUrl}}/lessons/lesson-id-here
+Authorization: Bearer your-access-token-here
+
+### 12. Get non-existent module
+GET {{contentUrl}}/modules/non-existent-id
+
+### 13. Get non-existent lesson
+GET {{contentUrl}}/lessons/non-existent-id 

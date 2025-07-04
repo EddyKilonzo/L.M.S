@@ -1,0 +1,44 @@
+### Analytics Endpoints Tests
+
+@baseUrl = http://localhost:3000
+@analyticsUrl = {{baseUrl}}/analytics
+
+### Note: These endpoints require authentication
+### First login to get access token, then use it in Authorization header
+
+### 1. Get dashboard analytics (requires ADMIN role)
+GET {{analyticsUrl}}/dashboard
+Authorization: Bearer your-access-token-here
+
+### 2. Get user roles distribution
+GET {{analyticsUrl}}/users/roles
+Authorization: Bearer your-access-token-here
+
+### 3. Get course enrollment statistics
+GET {{analyticsUrl}}/courses/enrollment-stats
+Authorization: Bearer your-access-token-here
+
+### 4. Get instructor analytics
+GET {{analyticsUrl}}/instructor/instructor-id-here
+Authorization: Bearer your-access-token-here
+
+### 5. Get student progress analytics
+GET {{analyticsUrl}}/student/student-id-here/progress
+Authorization: Bearer your-access-token-here
+
+### 6. Get analytics for non-existent instructor
+GET {{analyticsUrl}}/instructor/non-existent-instructor-id
+Authorization: Bearer your-access-token-here
+
+### 7. Get analytics for non-existent student
+GET {{analyticsUrl}}/student/non-existent-student-id/progress
+Authorization: Bearer your-access-token-here
+
+### 8. Get dashboard without authentication
+GET {{analyticsUrl}}/dashboard
+
+### 9. Get user roles without authentication
+GET {{analyticsUrl}}/users/roles
+
+### 10. Get course stats without authentication
+GET {{analyticsUrl}}/courses/enrollment-stats 
