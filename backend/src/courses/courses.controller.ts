@@ -16,7 +16,6 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -35,7 +34,6 @@ interface RequestWithUser {
 }
 
 @ApiTags('courses')
-@ApiBearerAuth()
 @Controller('courses')
 export class CoursesController {
   constructor(private coursesService: CoursesService) {}
@@ -82,8 +80,6 @@ export class CoursesController {
     description: 'Maximum price filter',
   })
   @ApiResponse({ status: 200, description: 'List of courses' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN', 'INSTRUCTOR', 'STUDENT')
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -146,8 +142,7 @@ export class CoursesController {
   @Get('categories')
   @ApiOperation({ summary: 'Get all course categories' })
   @ApiResponse({ status: 200, description: 'List of categories' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN', 'INSTRUCTOR', 'STUDENT')
+  // Removed authentication guards to make categories public
   async getCategories() {
     return await this.coursesService.getCategories();
   }
@@ -217,8 +212,6 @@ export class CoursesController {
   @ApiParam({ name: 'id', description: 'Course ID' })
   @ApiResponse({ status: 200, description: 'Course found' })
   @ApiResponse({ status: 404, description: 'Course not found' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN', 'INSTRUCTOR', 'STUDENT')
   async findOne(@Param('id') id: string) {
     return await this.coursesService.findOne(id);
   }
@@ -257,5 +250,29 @@ export class CoursesController {
     @CurrentUser() currentUser: UserResponse,
   ) {
     return await this.coursesService.remove(id, currentUser);
+  }
+
+  @Get(':id/related')
+  @ApiOperation({ summary: 'Get related courses' })
+  @ApiParam({ name: 'id', description: 'Course ID' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of related courses',
+  })
+  @ApiResponse({ status: 200, description: 'Related courses found' })
+  @ApiResponse({ status: 404, description: 'Course not found' })
+  async findRelated(@Param('id') id: string, @Query('limit') limit?: string) {
+    const limitNum = limit ? parseInt(limit) : 4;
+    return await this.coursesService.findRelated(id, limitNum);
+  }
+
+  @Get(':id/counts')
+  @ApiOperation({ summary: 'Get course counts (enrollments and reviews)' })
+  @ApiParam({ name: 'id', description: 'Course ID' })
+  @ApiResponse({ status: 200, description: 'Course counts found' })
+  @ApiResponse({ status: 404, description: 'Course not found' })
+  async getCourseCounts(@Param('id') id: string) {
+    return await this.coursesService.getCourseCounts(id);
   }
 }

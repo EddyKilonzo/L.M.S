@@ -28,6 +28,8 @@
           title="Click to change profile photo"
         />
       </div>
+      <button *ngIf="selectedFile" (click)="removeFile()" type="button" class="mb-2 px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">Remove</button>
+      <button *ngIf="selectedFile" (click)="onSaveImage()" type="button" class="mb-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">Save Image</button>
       <h2 class="font-bold text-xl mb-1 text-gray-800">{{ user?.firstName }} {{ user?.lastName }}</h2>
       <p class="text-gray-500 text-sm">{{ user?.role || 'Student' }}</p>
     </div>
@@ -48,6 +50,7 @@
           </button>
 
           <!-- Add Course Tab -->
+          <!--
           <button 
             (click)="setActiveTab('add-course')" 
             [class]="activeTab === 'add-course' ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-sm' : 'text-gray-600 hover:bg-gray-50 border-transparent hover:text-blue-600'"
@@ -57,6 +60,7 @@
             </svg>
             <span>Add Course</span>
           </button>
+          -->
 
           <!-- My Students Tab -->
           <button 
@@ -134,7 +138,7 @@
             [class]="activeTab === 'teachers' ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-sm' : 'text-gray-600 hover:bg-gray-50 border-transparent hover:text-blue-600'"
             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 font-medium">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
             </svg>
             <span>Teachers</span>
           </button>
@@ -157,7 +161,7 @@
             [class]="activeTab === 'reviews' ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-sm' : 'text-gray-600 hover:bg-gray-50 border-transparent hover:text-blue-600'"
             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 font-medium">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.38-2.454a1 1 0 00-1.176 0l-3.38 2.454c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
             </svg>
             <span>My Reviews</span>
           </button>
@@ -276,30 +280,72 @@
             Filter
           </button>
           <!-- Add Course Button for Instructors -->
-          <button *ngIf="user?.role === 'INSTRUCTOR'" (click)="setActiveTab('add-course')" class="bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm">
+          <button *ngIf="user?.role === 'INSTRUCTOR'" routerLink="/course-creation" class="bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-            Add Course
+            Create Course
           </button>
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div *ngFor="let course of filteredCourses" class="course-card">
           <div class="course-image-wrapper">
-            <img [src]="course.image" alt="Course image" />
+            <img [src]="course.imageUrl || '/assets/images/course-image2.jpg'" alt="Course image" />
           </div>
           <div class="course-card-content flex-1 flex flex-col">
-            <h2 class="course-title">{{ course.title }}</h2>
-            <div class="course-instructor">by {{ course.instructor }}</div>
-            <div class="course-rating">
-              <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
-              <span class="font-medium text-gray-700">{{ course.rating }}</span>
-              <span class="text-gray-400 text-sm">({{ course.reviews }} reviews)</span>
+            <h2 class="course-title text-gray-900 font-bold">{{ course.title }}</h2>
+            <div class="course-instructor text-gray-700 font-medium">by {{ course.instructor.firstName }} {{ course.instructor.lastName }}</div>
+            <div class="course-category text-sm text-gray-600 mb-2 font-medium">{{ course.category.name }}</div>
+            <div class="course-price text-lg font-semibold text-blue-600 mb-2">KSH {{ course.price }}</div>
+
+            <!-- Progress Section - Only for Students -->
+            <div *ngIf="user?.role !== 'INSTRUCTOR'" class="mb-3">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-gray-800">Your Progress</span>
+                <span class="text-sm font-semibold text-blue-600">{{ getCourseProgress(course) }}%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                     [style.width.%]="getCourseProgress(course)"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-600 mt-1">
+                <span>{{ getCompletedLessons(course) }} completed</span>
+                <span>{{ getTotalLessons(course) }} total</span>
+              </div>
             </div>
-            <button class="go-to-btn">
-              {{ user?.role === 'INSTRUCTOR' ? 'Manage Course' : 'Go to Course' }}
-            </button>
+            
+            <div class="course-stats text-sm text-gray-700 mb-3">
+              <span class="mr-3 font-medium">{{ course._count?.enrollments || 0 }} students</span>
+              <span class="font-medium">{{ course._count?.reviews || 0 }} reviews</span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button *ngIf="user?.role === 'INSTRUCTOR'" class="w-full bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors mb-2" (click)="manageCourse(course)">
+                Manage Course
+              </button>
+              
+              <!-- Access Course Button - Always show for students -->
+              <button 
+                      *ngIf="user?.role !== 'INSTRUCTOR'"
+                      class="w-full bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors border-none cursor-pointer"
+                      (click)="goToCourse(course.id)">
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  Access Course
+                </div>
+              </button>
+              
+              <!-- View Course Button - For instructors -->
+              <button 
+                      *ngIf="user?.role === 'INSTRUCTOR'"
+                      class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors border-none cursor-pointer"
+                      (click)="goToCourse(course.id)">
+                View Course
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -316,49 +362,90 @@
     </div>
     <!-- Teachers Section -->
     <div *ngIf="activeTab === 'teachers'" class="bg-white rounded-2xl shadow-xl p-10 h-fit">
-      <div class="teachers-controls flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-        <h1 class="text-2xl font-bold text-gray-800">Teachers <span class="text-gray-400 text-base font-normal">({{ teachers.length }})</span></h1>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <h1 class="text-2xl font-bold text-gray-800">My Instructors <span class="text-gray-400 text-base font-normal">({{ filteredTeachers.length }})</span></h1>
         <div class="flex flex-col md:flex-row gap-2 md:gap-4 w-full md:w-auto">
-          <input type="text" [(ngModel)]="teacherSearch" placeholder="Search teachers" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-          <select [(ngModel)]="teacherRatingFilter" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          <input 
+            type="text" 
+            [(ngModel)]="teacherSearch" 
+            placeholder="Search instructors..." 
+            class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          />
+          <select 
+            [(ngModel)]="teacherRatingFilter" 
+            class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
             <option value="">All Ratings</option>
             <option value="5">5 Stars</option>
             <option value="4">4+ Stars</option>
             <option value="3">3+ Stars</option>
             <option value="2">2+ Stars</option>
           </select>
-          <button class="filter-btn px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 7a1 1 0 011-1h10a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zm0 7a1 1 0 011-1h7a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z"/></svg>
-            Filter
-          </button>
         </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let teacher of filteredTeachers" class="teacher-card">
-          <div class="teacher-image-wrapper">
-            <img [src]="teacher.image" alt="Teacher image" />
-          </div>
-          <div class="teacher-card-content flex-1 flex flex-col">
-            <h2 class="teacher-name">{{ teacher.name }}</h2>
-            <div class="teacher-title">{{ teacher.title }}</div>
-            <div class="teacher-rating">
-              <svg class="star-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"/></svg>
-              <span class="font-medium text-gray-700">{{ teacher.rating }}</span>
-              <span class="text-gray-400 text-sm">({{ teacher.reviews }} reviews)</span>
+      
+      <!-- Loading State -->
+      <div *ngIf="courses.length === 0" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Loading instructors...</span>
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="courses.length > 0 && filteredTeachers.length === 0" class="text-center py-12">
+        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">No Instructors Found</h3>
+        <p class="text-gray-500">No instructors match your search criteria.</p>
+      </div>
+      
+      <!-- Instructors Grid -->
+      <div *ngIf="filteredTeachers.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let teacher of filteredTeachers" class="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-700 flex items-center justify-center bg-blue-100">
+              <img 
+                *ngIf="teacher.profileImage" 
+                [src]="teacher.profileImage" 
+                [alt]="teacher.firstName + ' ' + teacher.lastName" 
+                class="w-full h-full object-cover"
+              />
+              <div *ngIf="!teacher.profileImage" class="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                {{ teacher.firstName.charAt(0) }}{{ teacher.lastName.charAt(0) }}
+              </div>
             </div>
-            <button class="send-message-btn">Send Message</button>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-800 text-lg">{{ teacher.firstName }} {{ teacher.lastName }}</h3>
+              <p class="text-sm text-gray-500">{{ teacher.email }}</p>
+              <p class="text-xs text-blue-700 font-semibold mt-1">{{ teacher.coursesTaught }} course{{ teacher.coursesTaught !== 1 ? 's' : '' }} enrolled</p>
+            </div>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="text-sm text-gray-600">
+              <p *ngIf="teacher.about">{{ teacher.about }}</p>
+              <p *ngIf="!teacher.about" class="text-gray-400 italic">No bio available</p>
+            </div>
+            
+            <!-- Enrolled Courses List -->
+            <div class="space-y-2">
+              <h4 class="text-sm font-semibold text-gray-700">Enrolled Courses:</h4>
+              <div class="space-y-1">
+                <div *ngFor="let course of getInstructorCourses(teacher.id)" class="text-xs text-gray-600 bg-white rounded px-2 py-1 border">
+                  {{ course.title }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex gap-2 pt-2">
+              <button 
+                (click)="sendMessageToInstructor(teacher)"
+                class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                Send Message
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- Pagination -->
-      <div class="flex justify-center mt-8">
-        <nav class="teachers-pagination inline-flex rounded-md shadow-sm" aria-label="Pagination">
-          <button (click)="setTeacherPage(teacherPage - 1)" [disabled]="teacherPage === 1">&lt;</button>
-          <ng-container *ngFor="let page of [].constructor(teacherTotalPages); let i = index">
-            <button (click)="setTeacherPage(i + 1)" [ngClass]="{active: teacherPage === i + 1}">{{ i + 1 }}</button>
-          </ng-container>
-          <button (click)="setTeacherPage(teacherPage + 1)" [disabled]="teacherPage === teacherTotalPages">&gt;</button>
-        </nav>
       </div>
     </div>
     <!-- Messages Section -->
@@ -478,10 +565,17 @@
               </div>
             </div>
           </div>
-          <div class="mb-2 font-semibold text-gray-700">Course Name: <span class="text-gray-900">{{ review.courseName }}</span></div>
-          <div class="mb-2 text-gray-700">Rating: <span class="text-yellow-500">&#9733;&#9733;&#9733;&#9733;&#9733;</span></div>
+          <div class="mb-2 font-semibold text-gray-700">Course Name: <span class="text-gray-900">{{ review.course.title }}</span></div>
+          <div class="mb-2 text-gray-700">Rating: 
+            <span class="text-yellow-500">
+              <ng-container *ngFor="let star of [1,2,3,4,5]">
+                <span *ngIf="star <= review.rating">&#9733;</span>
+                <span *ngIf="star > review.rating">&#9734;</span>
+              </ng-container>
+            </span>
+          </div>
           <div class="mb-2 text-gray-700 font-semibold">Review:</div>
-          <div *ngIf="editingReviewId !== review.id" class="text-gray-700">{{ review.text }}</div>
+          <div *ngIf="editingReviewId !== review.id" class="text-gray-700">{{ review.comment || 'No comment provided' }}</div>
           <div *ngIf="editingReviewId === review.id" class="flex flex-col gap-2">
             <!-- Editable rating stars -->
             <div class="flex items-center mb-2">
@@ -661,53 +755,158 @@
 
     <!-- My Students Section (Instructors Only) -->
     <div *ngIf="activeTab === 'students' && user?.role === 'INSTRUCTOR'" class="bg-white rounded-2xl shadow-xl p-10 h-fit">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">My Students</h1>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">My Students</h1>
+        <div class="flex items-center gap-4">
+          <select 
+            [(ngModel)]="selectedCourseFilter" 
+            (change)="filterStudentsByCourse()"
+            class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Courses</option>
+            <option *ngFor="let course of courses" [value]="course.id">{{ course.title }}</option>
+          </select>
+          <button 
+            (click)="refreshStudentData()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+      
+      <!-- Loading State -->
+      <div *ngIf="loadingStudents" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Loading students...</span>
+      </div>
+      
+      <!-- Students Grid -->
+      <div *ngIf="!loadingStudents" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let student of filteredStudents" class="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
           <div class="flex items-center gap-4 mb-4">
             <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-              JD
+              {{ getStudentInitials(student.student.firstName, student.student.lastName) }}
             </div>
-            <div>
-              <h3 class="font-semibold text-gray-800">John Doe</h3>
-              <p class="text-sm text-gray-500">Web Development Course</p>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-800">{{ student.student.firstName }} {{ student.student.lastName }}</h3>
+              <p class="text-sm text-gray-500">{{ student.course.title }}</p>
+              <p class="text-xs text-gray-400">{{ student.student.email }}</p>
             </div>
           </div>
-          <div class="space-y-2">
+          
+          <!-- Progress Section -->
+          <div class="space-y-3">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Progress:</span>
-              <span class="font-semibold text-green-600">75%</span>
+              <span class="font-semibold" [ngClass]="{
+                'text-green-600': student.progress >= 80,
+                'text-yellow-600': student.progress >= 50 && student.progress < 80,
+                'text-red-600': student.progress < 50
+              }">{{ student.progress }}%</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2">
-              <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+              <div class="h-2 rounded-full transition-all duration-300" 
+                   [ngClass]="{
+                     'bg-green-500': student.progress >= 80,
+                     'bg-yellow-500': student.progress >= 50 && student.progress < 80,
+                     'bg-red-500': student.progress < 50
+                   }"
+                   [style.width.%]="student.progress"></div>
             </div>
+            
+            <!-- Additional Stats -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="text-center p-2 bg-white rounded">
+                <div class="font-semibold text-gray-800">{{ student.completedLessons || 0 }}</div>
+                <div class="text-gray-500">Completed</div>
+              </div>
+              <div class="text-center p-2 bg-white rounded">
+                <div class="font-semibold text-gray-800">{{ getDaysSinceEnrollment(student.enrolledAt) }}</div>
+                <div class="text-gray-500">Days</div>
+              </div>
+            </div>
+            
             <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Last Active:</span>
-              <span class="text-gray-800">2 days ago</span>
+              <span class="text-gray-600">Enrolled:</span>
+              <span class="text-gray-800">{{ formatDate(student.enrolledAt) }}</span>
+            </div>
+            
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600">Status:</span>
+              <span class="font-semibold" [ngClass]="{
+                'text-green-600': student.completed,
+                'text-blue-600': !student.completed
+              }">{{ student.completed ? 'Completed' : 'In Progress' }}</span>
             </div>
           </div>
+          
+          <!-- Action Buttons -->
+          <div class="mt-4 flex gap-2">
+            <button 
+              (click)="viewStudentDetails(student)"
+              class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+              View Details
+            </button>
+            <button 
+              (click)="sendMessageToStudent(student)"
+              class="bg-gray-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
-        <!-- Add more student cards here -->
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="!loadingStudents && filteredStudents.length === 0" class="text-center py-12">
+        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">No Students Found</h3>
+        <p class="text-gray-500">No students are enrolled in your courses yet.</p>
       </div>
     </div>
 
     <!-- Analytics Section (Instructors Only) -->
     <div *ngIf="activeTab === 'analytics' && user?.role === 'INSTRUCTOR'" class="bg-white rounded-2xl shadow-xl p-10 h-fit">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-        </svg>
-        Analytics Dashboard
-      </h1>
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+          <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Analytics Dashboard
+        </h1>
+        <button 
+          (click)="refreshAnalytics()"
+          [disabled]="loadingAnalytics"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+          <svg *ngIf="loadingAnalytics" class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <svg *ngIf="!loadingAnalytics" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          {{ loadingAnalytics ? 'Refreshing...' : 'Refresh' }}
+        </button>
+      </div>
+      
+      <!-- Loading State -->
+      <div *ngIf="loadingAnalytics" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Loading analytics...</span>
+      </div>
       
       <!-- Overview Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div *ngIf="!loadingAnalytics && analyticsData" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200 shadow-sm">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-600 text-sm font-semibold">Total Students</p>
-              <p class="text-2xl font-bold text-gray-800">1,234</p>
-              <p class="text-gray-600 text-xs mt-1">+12% from last month</p>
+              <p class="text-2xl font-bold text-gray-800">{{ analyticsData.totalStudents }}</p>
+              <p class="text-gray-600 text-xs mt-1">Enrolled in your courses</p>
             </div>
             <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -720,8 +919,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-600 text-sm font-semibold">Total Revenue</p>
-              <p class="text-2xl font-bold text-gray-800">$12,345</p>
-              <p class="text-gray-600 text-xs mt-1">+8% from last month</p>
+              <p class="text-2xl font-bold text-gray-800">KSH {{ analyticsData.totalRevenue }}</p>
+              <p class="text-gray-600 text-xs mt-1">From all enrollments</p>
             </div>
             <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -734,8 +933,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-600 text-sm font-semibold">Active Courses</p>
-              <p class="text-2xl font-bold text-gray-800">8</p>
-              <p class="text-gray-600 text-xs mt-1">2 new this month</p>
+              <p class="text-2xl font-bold text-gray-800">{{ analyticsData.activeCourses }}</p>
+              <p class="text-gray-600 text-xs mt-1">Published courses</p>
             </div>
             <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -748,8 +947,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-600 text-sm font-semibold">Avg. Rating</p>
-              <p class="text-2xl font-bold text-gray-800">4.8</p>
-              <p class="text-gray-600 text-xs mt-1">+0.2 from last month</p>
+              <p class="text-2xl font-bold text-gray-800">{{ analyticsData.averageRating }}</p>
+              <p class="text-gray-600 text-xs mt-1">Student satisfaction</p>
             </div>
             <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center shadow-lg">
               <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -761,150 +960,55 @@
       </div>
 
       <!-- Course Analytics -->
-      <div class="mb-8">
+      <div *ngIf="!loadingAnalytics && analyticsData" class="mb-8">
         <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
           </svg>
           Course Performance
         </h2>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Course 1 -->
-          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        
+        <!-- Empty State -->
+        <div *ngIf="analyticsData.coursePerformance.length === 0" class="text-center py-12">
+          <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-600 mb-2">No Course Data</h3>
+          <p class="text-gray-500">No students have enrolled in your courses yet.</p>
+        </div>
+        
+        <div *ngIf="analyticsData.coursePerformance.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Course Performance Cards -->
+          <div *ngFor="let course of analyticsData.coursePerformance" class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="font-semibold text-gray-800">Web Development Fundamentals</h3>
-              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
+              <h3 class="font-semibold text-gray-800">{{ course.title }}</h3>
+              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{{ course.status }}</span>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">156</p>
+                <p class="text-2xl font-bold text-gray-800">{{ course.totalStudents }}</p>
                 <p class="text-xs text-gray-500">Students</p>
               </div>
               <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">$2,340</p>
+                <p class="text-2xl font-bold text-gray-800">KSH {{ course.revenue }}</p>
                 <p class="text-xs text-gray-500">Revenue</p>
               </div>
               <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">4.9</p>
+                <p class="text-2xl font-bold text-gray-800">{{ course.rating }}</p>
                 <p class="text-xs text-gray-500">Rating</p>
               </div>
               <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">78%</p>
+                <p class="text-2xl font-bold text-gray-800">{{ course.completionRate | number:'1.0-0' }}%</p>
                 <p class="text-xs text-gray-500">Completion</p>
               </div>
             </div>
             <div class="space-y-2">
               <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Progress</span>
-                <span class="font-semibold text-gray-800">78%</span>
+                <span class="text-gray-600">Avg. Progress</span>
+                <span class="font-semibold text-gray-800">{{ course.averageProgress | number:'1.0-0' }}%</span>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 78%"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Course 2 -->
-          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="font-semibold text-gray-800">UI/UX Design Masterclass</h3>
-              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">89</p>
-                <p class="text-xs text-gray-500">Students</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">$1,780</p>
-                <p class="text-xs text-gray-500">Revenue</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">4.7</p>
-                <p class="text-xs text-gray-500">Rating</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">65%</p>
-                <p class="text-xs text-gray-500">Completion</p>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Progress</span>
-                <span class="font-semibold text-gray-800">65%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Course 3 -->
-          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="font-semibold text-gray-800">JavaScript Advanced</h3>
-              <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">New</span>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">45</p>
-                <p class="text-xs text-gray-500">Students</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">$900</p>
-                <p class="text-xs text-gray-500">Revenue</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">4.8</p>
-                <p class="text-xs text-gray-500">Rating</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">32%</p>
-                <p class="text-xs text-gray-500">Completion</p>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Progress</span>
-                <span class="font-semibold text-gray-800">32%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 32%"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Course 4 -->
-          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="font-semibold text-gray-800">React Development</h3>
-              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">203</p>
-                <p class="text-xs text-gray-500">Students</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">$4,060</p>
-                <p class="text-xs text-gray-500">Revenue</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">4.9</p>
-                <p class="text-xs text-gray-500">Rating</p>
-              </div>
-              <div class="text-center">
-                <p class="text-2xl font-bold text-gray-800">85%</p>
-                <p class="text-xs text-gray-500">Completion</p>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Progress</span>
-                <span class="font-semibold text-gray-800">85%</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 85%"></div>
+                <div class="bg-blue-600 h-2 rounded-full" [style.width.%]="course.averageProgress"></div>
               </div>
             </div>
           </div>
@@ -912,50 +1016,36 @@
       </div>
 
       <!-- Recent Activity -->
-      <div>
+      <div *ngIf="!loadingAnalytics && analyticsData">
         <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
           </svg>
           Recent Activity
         </h2>
-        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        
+        <!-- Empty State -->
+        <div *ngIf="analyticsData.recentActivity.length === 0" class="text-center py-8">
+          <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+          </svg>
+          <h3 class="text-md font-semibold text-gray-600 mb-1">No Recent Activity</h3>
+          <p class="text-gray-500 text-sm">Activity will appear here as students engage with your courses.</p>
+        </div>
+        
+        <div *ngIf="analyticsData.recentActivity.length > 0" class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div class="space-y-4">
-            <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+            <div *ngFor="let activity of analyticsData.recentActivity" class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
               <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                 </svg>
               </div>
               <div class="flex-1">
-                <p class="font-semibold text-gray-800">New student enrolled in React Development</p>
-                <p class="text-sm text-gray-500">Sarah Johnson joined 2 hours ago</p>
+                <p class="font-semibold text-gray-800">{{ activity.message }}</p>
+                <p class="text-sm text-gray-500">{{ activity.student }}</p>
               </div>
-              <span class="text-xs text-gray-400">2h ago</span>
-            </div>
-            <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-              <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <p class="font-semibold text-gray-800">Course completed by student</p>
-                <p class="text-sm text-gray-500">Mike Davis finished Web Development Fundamentals</p>
-              </div>
-              <span class="text-xs text-gray-400">5h ago</span>
-            </div>
-            <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-              <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.454a1 1 0 00-1.175 0l-3.38 2.454c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z"></path>
-                </svg>
-              </div>
-              <div class="flex-1">
-                <p class="font-semibold text-gray-800">New 5-star review received</p>
-                <p class="text-sm text-gray-500">Amazing course! Very well explained - UI/UX Design</p>
-              </div>
-              <span class="text-xs text-gray-400">1d ago</span>
+              <span class="text-xs text-gray-400">{{ activity.timeAgo }}</span>
             </div>
           </div>
         </div>

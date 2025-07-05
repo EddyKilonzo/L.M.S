@@ -1,0 +1,175 @@
+<app-shared-navbar></app-shared-navbar>
+
+<div class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto py-8 px-4">
+    <!-- Breadcrumb and Heading -->
+    <div class="mb-8 mt-6"style="margin-left: 45px;">
+      <nav class="text-sm text-gray-500 mb-4 flex items-center gap-2">
+        <span class="font-semibold text-gray-700">LMS</span>
+        <span>/</span>
+        <span>Cart</span>
+        <span>/</span>
+        <span class="text-blue-600 font-semibold" >Checkout</span>
+      </nav>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">Checkout Page</h1>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+
+    <div *ngIf="error" class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ error }}</h2>
+      <button (click)="goBack()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+        Go Back
+      </button>
+    </div>
+
+    <div *ngIf="!loading && !error && course" class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left: Form -->
+        <div class="lg:col-span-2">
+          <form (ngSubmit)="proceedToPayment()" class="bg-white rounded-lg shadow p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="block text-gray-700 font-medium mb-1">Country</label>
+                <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter Country" [(ngModel)]="country" name="country">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-1">State/Union Territory</label>
+                <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter State" [(ngModel)]="state" name="state">
+              </div>
+            </div>
+
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Payment Method</h2>
+            <div class="flex gap-4 mb-4">
+              <button type="button" (click)="selectedPayment = 'card'" [ngClass]="{'bg-blue-600 text-white': selectedPayment === 'card', 'bg-gray-100 text-gray-700': selectedPayment !== 'card'}" class="flex-1 py-2 rounded-lg font-semibold border border-blue-600 transition-colors">Credit/Debit Card</button>
+              <button type="button" (click)="selectedPayment = 'paypal'" [ngClass]="{'bg-blue-600 text-white': selectedPayment === 'paypal', 'bg-gray-100 text-gray-700': selectedPayment !== 'paypal'}" class="flex-1 py-2 rounded-lg font-semibold border border-blue-600 transition-colors">PayPal</button>
+              <button type="button" (click)="selectedPayment = 'mpesa'" [ngClass]="{'bg-blue-600 text-white': selectedPayment === 'mpesa', 'bg-gray-100 text-gray-700': selectedPayment !== 'mpesa'}" class="flex-1 py-2 rounded-lg font-semibold border border-blue-600 transition-colors">M-pesa</button>
+            </div>
+
+            <!-- Card Fields -->
+            <div *ngIf="selectedPayment === 'card'" class="space-y-4 mb-4">
+              <div>
+                <label class="block text-gray-700 font-medium mb-1">Name on Card</label>
+                <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Cardholder Name" [(ngModel)]="cardName" name="cardName">
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-gray-700 font-medium mb-1">Card Number</label>
+                  <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Card Number" [(ngModel)]="cardNumber" name="cardNumber">
+                </div>
+                <div>
+                  <label class="block text-gray-700 font-medium mb-1">CVV/CVC</label>
+                  <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="CVV" [(ngModel)]="cardCVV" name="cardCVV">
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-gray-700 font-medium mb-1">Expiry Date</label>
+                  <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="MM/YY" [(ngModel)]="cardExpiry" name="cardExpiry">
+                </div>
+                <div>
+                  <label class="block text-gray-700 font-medium mb-1">Billing Country</label>
+                  <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Country" [(ngModel)]="billingCountry" name="billingCountry">
+                </div>
+              </div>
+            </div>
+
+            <!-- PayPal Notice -->
+            <div *ngIf="selectedPayment === 'paypal'" class="mb-4">
+              <div class="bg-blue-50 border border-blue-200 text-blue-700 rounded-lg p-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M7.5 21a1 1 0 0 1-1-1.2l2.5-14A1 1 0 0 1 10 5h7.5a2.5 2.5 0 0 1 0 5H13a1 1 0 0 0 0 2h4.5a2.5 2.5 0 0 1 0 5H12a1 1 0 0 0 0 2h5.5a1 1 0 1 1 0 2H7.5z"/></svg>
+                <span>Pay securely with PayPal. You will be redirected to PayPal to complete your purchase.</span>
+              </div>
+            </div>
+
+            <!-- M-pesa Fields -->
+            <div *ngIf="selectedPayment === 'mpesa'" class="space-y-4 mb-4">
+              <div>
+                <label class="block text-gray-700 font-medium mb-1">M-pesa Phone Number</label>
+                <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter M-pesa Phone Number" [(ngModel)]="mpesaPhoneNumber" name="mpesaPhoneNumber">
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-1">Amount</label>
+                <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter Amount" [(ngModel)]="mpesaAmount" name="mpesaAmount">
+              </div>
+            </div>
+
+            <button type="submit" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+              Proceed to Payment
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Order Summary -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Order Summary</h2>
+            
+            <!-- Course Details -->
+            <div class="border-b border-gray-200 pb-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
+                  <img *ngIf="course?.imageUrl" [src]="course.imageUrl" [alt]="course.title" class="w-full h-full object-cover rounded-lg">
+                  <div *ngIf="!course?.imageUrl" class="w-full h-full bg-blue-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-medium text-gray-800 truncate">{{ course.title }}</h3>
+                  <p class="text-gray-500">By {{ course.instructor.firstName }} {{ course.instructor.lastName }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coupon Code -->
+            <div class="mb-4">
+              <label class="block text-gray-700 font-medium mb-2">Coupon Code</label>
+              <div class="flex gap-2">
+                <input type="text" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 coupon-input" placeholder="Enter coupon code" [(ngModel)]="couponCode" name="couponCode">
+                <button type="button" (click)="applyCoupon()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">Apply</button>
+              </div>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="space-y-2 mb-6">
+              <div class="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span>KSH {{ getTotal() }}</span>
+              </div>
+              <div *ngIf="getDiscount() > 0" class="flex justify-between text-green-600">
+                <span>Discount</span>
+                <span>-KSH {{ getDiscount() }}</span>
+              </div>
+              <div class="border-t border-gray-200 pt-2 flex justify-between font-semibold text-lg">
+                <span>Total</span>
+                <span>KSH {{ getFinalTotal() }}</span>
+              </div>
+            </div>
+
+            <!-- Checkout Button -->
+            <button (click)="proceedToPayment()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+              Complete Purchase
+            </button>
+
+            <!-- Security Notice -->
+            <div class="mt-4 text-center">
+              <div class="flex items-center justify-center gap-2 text-sm text-gray-500">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                </svg>
+                <span>Secure payment powered by Stripe</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -33,13 +33,7 @@
 
   <!-- Right: Actions -->
   <div class="flex items-center gap-4">
-    <!-- Only show "Teach on LMS" for non-instructors -->
-            <a *ngIf="!authenticated || user?.role !== 'INSTRUCTOR'" href="#" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 text-sm font-medium hidden md:block transition-colors">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-      </svg>
-      Teach on L.M.S
-    </a>
+
     
     <!-- Guest User Actions -->
     <ng-container *ngIf="!authenticated">
@@ -59,13 +53,24 @@
 
     <!-- Authenticated User Actions -->
     <ng-container *ngIf="authenticated">
+      <!-- Cart Icon (only for students) -->
+      <button *ngIf="user?.role !== 'INSTRUCTOR'" (click)="goToCart()" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50" title="Shopping Cart">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <!-- Cart Count Badge -->
+        <span *ngIf="cartCount > 0" class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-sm">
+          {{ cartCount > 99 ? '99+' : cartCount }}
+        </span>
+      </button>
+
       <!-- Wishlist Icon (only for students) -->
               <button *ngIf="user?.role !== 'INSTRUCTOR'" class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50" title="Wishlist">
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
         <!-- Wishlist Count Badge -->
-                  <span *ngIf="wishlistCount > 0" class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  <span *ngIf="wishlistCount > 0" class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-sm">
           {{ wishlistCount > 99 ? '99+' : wishlistCount }}
         </span>
       </button>
@@ -76,7 +81,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
         <!-- Notification Badge -->
-                  <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  <span class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-sm">
           3
         </span>
       </button>

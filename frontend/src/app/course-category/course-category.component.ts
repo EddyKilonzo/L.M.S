@@ -1,43 +1,188 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { SharedNavbar } from '../shared/navbar/navbar.component';
+import { CoursesService } from '../services/courses.service';
+import { CategoriesService } from '../services/categories.service';
+import { ToastService } from '../services/toast.service';
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  instructor: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  category: {
+    id: string;
+    name: string;
+  };
+  price: number;
+  difficulty: string;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    enrollments: number;
+    reviews: number;
+  };
+  modules?: {
+    id: string;
+    title: string;
+    lessons?: {
+      id: string;
+      title: string;
+    }[];
+  }[];
+  averageRating?: number;
+  totalReviews?: number;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  courseCount?: number;
+}
+
+interface Instructor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  courses?: Course[];
+}
 
 @Component({
   selector: 'app-course-category',
   standalone: true,
-  imports: [CommonModule, SharedNavbar],
+  imports: [CommonModule, FormsModule, SharedNavbar, RouterModule],
   templateUrl: './course-category.component.html',
   styleUrls: ['./course-category.component.css'],
 })
 export class CourseCategoryComponent implements OnInit {
+  // Make Math available in template
+  Math = Math;
+  
   openFilters: { [key: string]: boolean } = {
-    rating: true,
-    chapters: true,
-    price: true,
     category: true,
+    difficulty: true,
+    price: true,
   };
+
+  // Real data from backend
+  courses: Course[] = [];
+  categories: Category[] = [];
+  instructors: Instructor[] = [];
+  featuredCourses: Course[] = [];
+  
+  // Loading states
+  isLoading = false;
+  isLoadingCategories = false;
+  isLoadingInstructors = false;
+
+  // Search and filter
+  searchTerm = '';
+  selectedCategory = '';
+  selectedDifficulty = '';
+  selectedPriceRange = '';
+  selectedRating = '';
+
+  // Pagination
+  currentPage = 1;
+  pageSize = 12;
+  totalPages = 0;
+  totalCourses = 0;
+
+  // Mentor pagination
+  mentorCurrentPage = 1;
+  mentorPageSize = 5;
+  paginatedMentors: Instructor[] = [];
+  totalMentorPages = 0;
+
+  constructor(
+    private coursesService: CoursesService,
+    private categoriesService: CategoriesService,
+    private toastService: ToastService
+  ) {}
+
+  ngOnInit() {
+    this.loadCategories();
+    this.loadCourses();
+  }
+
+  loadCourses() {
+    this.isLoading = true;
+    this.coursesService.getCourses().subscribe({
+      next: (response: any) => {
+        this.courses = response.data || [];
+        this.totalCourses = response.total || this.courses.length;
+        this.totalPages = response.totalPages || Math.ceil(this.courses.length / this.pageSize);
+        this.featuredCourses = this.courses.slice(0, 4); // First 4 courses as featured
+        this.isLoading = false;
+        console.log('Courses loaded:', this.courses);
+        // Load instructors after courses are loaded
+        this.loadInstructors();
+      },
+      error: (error) => {
+        console.error('Error loading courses:', error);
+        this.toastService.show('Failed to load courses', 'error');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadCategories() {
+    this.isLoadingCategories = true;
+    this.categoriesService.getCategories().subscribe({
+      next: (response: any) => {
+        this.categories = response.data || [];
+        this.isLoadingCategories = false;
+        console.log('Categories loaded:', this.categories);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.toastService.show('Failed to load categories', 'error');
+        this.isLoadingCategories = false;
+      }
+    });
+  }
+
+  loadInstructors() {
+    this.isLoadingInstructors = true;
+    // Extract unique instructors from courses
+    const instructorMap = new Map<string, Instructor>();
+    
+    this.courses.forEach(course => {
+      const instructorId = course.instructor.id;
+      if (!instructorMap.has(instructorId)) {
+        instructorMap.set(instructorId, {
+          ...course.instructor,
+          role: 'INSTRUCTOR', // Add the missing role property
+          courses: []
+        });
+      }
+      instructorMap.get(instructorId)?.courses?.push(course);
+    });
+
+    this.instructors = Array.from(instructorMap.values());
+    this.totalMentorPages = Math.ceil(this.instructors.length / this.mentorPageSize);
+    this.updatePaginatedMentors();
+    this.isLoadingInstructors = false;
+  }
 
   toggleFilter(filter: string) {
     this.openFilters[filter] = !this.openFilters[filter];
   }
 
-  // Mentor pagination
-  mentorCurrentPage = 1;
-  mentorPageSize = 5;
-  paginatedMentors: any[] = [];
-  totalMentorPages = 0;
-
-  ngOnInit() {
-    this.totalMentorPages = Math.ceil(
-      this.mentors.length / this.mentorPageSize
-    );
-    this.updatePaginatedMentors();
-  }
-
   updatePaginatedMentors() {
     const startIndex = (this.mentorCurrentPage - 1) * this.mentorPageSize;
     const endIndex = startIndex + this.mentorPageSize;
-    this.paginatedMentors = this.mentors.slice(startIndex, endIndex);
+    this.paginatedMentors = this.instructors.slice(startIndex, endIndex);
   }
 
   goToMentorPage(page: number) {
@@ -61,218 +206,93 @@ export class CourseCategoryComponent implements OnInit {
     }
   }
 
-  courses = [
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-    {
-      title: 'Intermediate Design Concepts',
-      author: 'Jane Doe',
-      rating: 4.7,
-      reviews: 900,
-      hours: 18,
-      lectures: 120,
-      level: 'Intermediate',
-      price: 199.9,
-      image: 'assets/images/course-image2.jpg',
-    },
-    {
-      title: 'Advanced Design Techniques',
-      author: 'John Smith',
-      rating: 4.9,
-      reviews: 600,
-      hours: 25,
-      lectures: 180,
-      level: 'Advanced',
-      price: 249.9,
-      image: 'assets/images/course-image3.jpg',
-    },
-    {
-      title: 'UI/UX Design Bootcamp',
-      author: 'Emily Johnson',
-      rating: 4.8,
-      reviews: 1100,
-      hours: 30,
-      lectures: 200,
-      level: 'Beginner',
-      price: 299.9,
-      image: 'assets/images/course-image4.jpg',
-    },
-    {
-      title: 'Design Thinking and Innovation',
-      author: 'Michael Brown',
-      rating: 4.6,
-      reviews: 700,
-      hours: 20,
-      lectures: 140,
-      level: 'Intermediate',
-      price: 179.9,
-      image: 'assets/images/course-image5.jpg',
-    },
-    {
-      title: 'Mastering Adobe XD',
-      author: 'Sarah Wilson',
-      rating: 4.7,
-      reviews: 800,
-      hours: 15,
-      lectures: 100,
-      level: 'Advanced',
-      price: 219.9,
-      image: 'assets/images/course-image6.jpg',
-    },
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-  ];
+  // Filter methods
+  get filteredCourses(): Course[] {
+    let filtered = this.courses;
 
-  mentors = [
-    {
-      name: 'Ronald Richards',
-      title: 'UI/UX Designer',
-      rating: 4.8,
-      students: 2400,
-      image: 'assets/images/mentor-image.jpg',
-    },
-    {
-      name: 'Jane Doe',
-      title: 'Senior Designer',
-      rating: 4.7,
-      students: 1800,
-      image: 'assets/images/mentor-image2.jpg',
-    },
-    {
-      name: 'John Smith',
-      title: 'Design Lead',
-      rating: 4.9,
-      students: 1500,
-      image: 'assets/images/mentor-image3.jpg',
-    },
-    {
-      name: 'Emily Johnson',
-      title: 'UI/UX Specialist',
-      rating: 4.8,
-      students: 2100,
-      image: 'assets/images/mentor-image4.jpg',
-    },
-    {
-      name: 'Michael Brown',
-      title: 'Creative Director',
-      rating: 4.6,
-      students: 1300,
-      image: 'assets/images/mentor-image5.jpg',
-    },
-    {
-      name: 'Sarah Wilson',
-      title: 'Adobe Expert',
-      rating: 4.7,
-      students: 1700,
-      image: 'assets/images/mentor-image6.jpg',
-    },
-    {
-      name: 'Ronald Richards',
-      title: 'UI/UX Designer',
-      rating: 4.8,
-      students: 2400,
-      image: 'assets/images/mentor-image.jpg',
-    },
-    {
-      name: 'Ronald Richards',
-      title: 'UI/UX Designer',
-      rating: 4.8,
-      students: 2400,
-      image: 'assets/images/mentor-image.jpg',
-    },
-    {
-      name: 'Ronald Richards',
-      title: 'UI/UX Designer',
-      rating: 4.8,
-      students: 2400,
-      image: 'assets/images/mentor-image.jpg',
-    },
-  ];
+    // Search filter
+    if (this.searchTerm) {
+      filtered = filtered.filter(course =>
+        course.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        course.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        `${course.instructor.firstName} ${course.instructor.lastName}`.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
 
-  featuredCourses = [
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-    {
-      title: "Beginner's Guide to Design",
-      author: 'Ronald Richards',
-      rating: 4.5,
-      reviews: 1200,
-      hours: 22,
-      lectures: 155,
-      level: 'Beginner',
-      price: 149.9,
-      image: 'assets/images/course-image.jpg',
-    },
-  ];
+    // Category filter
+    if (this.selectedCategory) {
+      filtered = filtered.filter(course => course.category.id === this.selectedCategory);
+    }
+
+    // Difficulty filter
+    if (this.selectedDifficulty) {
+      filtered = filtered.filter(course => course.difficulty === this.selectedDifficulty);
+    }
+
+    // Price range filter
+    if (this.selectedPriceRange) {
+      const [min, max] = this.selectedPriceRange.split('-').map(Number);
+      filtered = filtered.filter(course => {
+        if (max) {
+          return course.price >= min && course.price <= max;
+        } else {
+          return course.price >= min;
+        }
+      });
+    }
+
+    // Rating filter
+    if (this.selectedRating) {
+      const minRating = Number(this.selectedRating);
+      // Note: This would need to be implemented when you have actual ratings
+      // For now, we'll skip rating filtering
+    }
+
+    return filtered;
+  }
+
+  // Helper methods for template
+  getInstructorName(instructor: any): string {
+    return `${instructor.firstName} ${instructor.lastName}`;
+  }
+
+  getInstructorStudentCount(instructor: any): number {
+    const total = instructor.courses?.reduce((total: number, course: Course) => 
+      total + (course._count?.enrollments || 0), 0) || 0;
+    return total;
+  }
+
+  formatStudentCount(count: number): string {
+    return count.toString();
+  }
+
+  getInstructorRating(instructor: any): number {
+    // Calculate average rating from instructor's courses
+    if (!instructor.courses || instructor.courses.length === 0) return 0;
+    const ratings = instructor.courses
+      .map((course: any) => course.averageRating)
+      .filter((r: number) => typeof r === 'number');
+    if (ratings.length === 0) return 0;
+    const sum = ratings.reduce((a: number, b: number) => a + b, 0);
+    return sum / ratings.length;
+  }
+
+  getCourseRating(course: Course): number {
+    // Use real average rating from backend
+    return course.averageRating || 0;
+  }
+
+  getCourseHours(course: Course): number {
+    // Calculate total hours from modules and lessons
+    // For now, estimate 30 minutes per lesson
+    const totalLessons = course.modules?.reduce((total, module) => 
+      total + (module.lessons?.length || 0), 0) || 0;
+    return Math.round(totalLessons * 0.5); // 30 minutes per lesson
+  }
+
+  getCourseLectures(course: Course): number {
+    // Count total lessons across all modules
+    return course.modules?.reduce((total, module) => 
+      total + (module.lessons?.length || 0), 0) || 0;
+  }
 }

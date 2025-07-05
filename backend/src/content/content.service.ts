@@ -46,7 +46,7 @@ export class ContentService {
       include: {
         module: true,
       },
-    })) as LessonWithModuleResponse;
+    })) as unknown as LessonWithModuleResponse;
   }
 
   async getCourseModules(courseId: string): Promise<ModuleResponse[]> {
@@ -116,7 +116,7 @@ export class ContentService {
       include: {
         module: true,
       },
-    })) as LessonWithModuleResponse;
+    })) as unknown as LessonWithModuleResponse;
   }
 
   async deleteModule(id: string): Promise<ModuleResponse> {

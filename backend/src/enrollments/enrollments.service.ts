@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailerService } from '../mailer/mailer.service';
 import {
@@ -27,7 +27,7 @@ export class EnrollmentsService {
     });
 
     if (existingEnrollment) {
-      throw new Error('Student is already enrolled in this course');
+      throw new ConflictException('Student is already enrolled in this course');
     }
 
     const enrollment = (await this.prisma.courseEnrollment.create({

@@ -8,13 +8,7 @@ import {
   UseGuards,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -24,12 +18,21 @@ import { UpdateUserDto } from './dto';
 import { UserResponse } from '../common/types';
 
 @ApiTags('users')
-@ApiBearerAuth()
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @Get('instructors')
+  @ApiOperation({ summary: 'Get all instructors (Public)' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all instructors with their courses count',
+  })
+  async findInstructors(): Promise<(UserResponse & { courseCount: number })[]> {
+    return await this.usersService.findInstructors();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   @ApiOperation({ summary: 'Get all users (Admin only)' })
   @ApiResponse({ status: 200, description: 'List of all users' })
@@ -42,6 +45,7 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(':id')
   @ApiOperation({
     summary: 'Get user by ID (Admin, Instructor, or own profile)',
@@ -62,6 +66,7 @@ export class UsersController {
     return user;
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Update user (Admin or own profile)' })
   @ApiParam({ name: 'id', description: 'User ID' })
@@ -77,6 +82,10 @@ export class UsersController {
     @Body() updateData: UpdateUserDto,
     @CurrentUser() currentUser: UserResponse,
   ): Promise<UserResponse> {
+    console.log('Update request - ID:', id);
+    console.log('Current user:', currentUser);
+    console.log('Update data:', updateData);
+
     try {
       const result = await this.usersService.update(
         id,
@@ -109,6 +118,7 @@ export class UsersController {
     }
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user (Admin or own profile)' })
   @ApiParam({ name: 'id', description: 'User ID' })

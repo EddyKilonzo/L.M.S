@@ -1,4 +1,8 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto';
 import {
@@ -16,10 +20,48 @@ export class CoursesService {
     createCourseDto: CreateCourseDto,
     instructorId: string,
   ): Promise<CourseWithInstructorAndCategoryResponse> {
+    // Add explicit types for modules and lessons
+    const { modules, ...courseData } = createCourseDto as CreateCourseDto & {
+      modules?: {
+        title: string;
+        description: string;
+        order: number;
+        lessons?: {
+          title: string;
+          description: string;
+          contentType: string;
+          contentUrl?: string;
+          order: number;
+        }[];
+      }[];
+    };
+
     return (await this.prisma.course.create({
       data: {
-        ...createCourseDto,
+        ...courseData,
         instructorId,
+        ...(modules &&
+          modules.length > 0 && {
+            modules: {
+              create: modules.map((module, index) => ({
+                title: module.title,
+                description: module.description,
+                order: module.order || index + 1,
+                ...(module.lessons &&
+                  module.lessons.length > 0 && {
+                    lessons: {
+                      create: module.lessons.map((lesson, lessonIndex) => ({
+                        title: lesson.title,
+                        description: lesson.description,
+                        contentType: lesson.contentType,
+                        contentUrl: lesson.contentUrl,
+                        order: lesson.order || lessonIndex + 1,
+                      })),
+                    },
+                  }),
+              })),
+            },
+          }),
       },
       include: {
         instructor: {
@@ -28,11 +70,24 @@ export class CoursesService {
             firstName: true,
             lastName: true,
             email: true,
+            role: true,
+            isVerified: true,
+            about: true,
+            profileImage: true,
+            createdAt: true,
           },
         },
         category: true,
+        modules: {
+          include: {
+            lessons: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
-    })) as CourseWithInstructorAndCategoryResponse;
+    })) as unknown as CourseWithInstructorAndCategoryResponse;
   }
 
   async findAll(
@@ -86,6 +141,8 @@ export class CoursesService {
               firstName: true,
               lastName: true,
               email: true,
+              about: true,
+              profileImage: true,
             },
           },
           category: true,
@@ -100,8 +157,25 @@ export class CoursesService {
       this.prisma.course.count({ where }),
     ]);
 
+    // Get average ratings for all courses
+    const coursesWithRatings = await Promise.all(
+      courses.map(async (course) => {
+        const ratingData = await this.prisma.courseReview.aggregate({
+          where: { courseId: course.id },
+          _avg: { rating: true },
+          _count: { rating: true },
+        });
+
+        return {
+          ...course,
+          averageRating: ratingData._avg.rating || 0,
+          totalReviews: ratingData._count.rating,
+        };
+      })
+    );
+
     return {
-      data: courses as unknown as CourseWithInstructorAndCategoryResponse[],
+      data: coursesWithRatings as unknown as CourseWithInstructorAndCategoryResponse[],
       total,
       page,
       limit,
@@ -121,6 +195,8 @@ export class CoursesService {
             firstName: true,
             lastName: true,
             email: true,
+            about: true,
+            profileImage: true,
           },
         },
         category: true,
@@ -170,6 +246,8 @@ export class CoursesService {
               firstName: true,
               lastName: true,
               email: true,
+              about: true,
+              profileImage: true,
             },
           },
           category: true,
@@ -196,7 +274,7 @@ export class CoursesService {
   async getPopularCourses(
     limit = 6,
   ): Promise<CourseWithInstructorAndCategoryResponse[]> {
-    return (await this.prisma.course.findMany({
+    const courses = await this.prisma.course.findMany({
       take: limit,
       orderBy: {
         enrollments: {
@@ -220,16 +298,91 @@ export class CoursesService {
           },
         },
       },
-    })) as unknown as CourseWithInstructorAndCategoryResponse[];
+    });
+
+    // Get average ratings for all courses
+    const coursesWithRatings = await Promise.all(
+      courses.map(async (course) => {
+        const ratingData = await this.prisma.courseReview.aggregate({
+          where: { courseId: course.id },
+          _avg: { rating: true },
+          _count: { rating: true },
+        });
+
+        return {
+          ...course,
+          averageRating: ratingData._avg.rating || 0,
+          totalReviews: ratingData._count.rating,
+        };
+      })
+    );
+
+    return coursesWithRatings as unknown as CourseWithInstructorAndCategoryResponse[];
   }
 
   async update(
     id: string,
     updateCourseDto: UpdateCourseDto,
   ): Promise<CourseWithInstructorAndCategoryResponse> {
+    // Extract modules from the update data
+    const { modules, ...courseData } = updateCourseDto as UpdateCourseDto & {
+      modules?: {
+        title: string;
+        description: string;
+        order: number;
+        lessons?: {
+          title: string;
+          description: string;
+          contentType: string;
+          contentUrl?: string;
+          order: number;
+        }[];
+      }[];
+    };
+
+    // First, delete existing modules and lessons for this course
+    await this.prisma.lesson.deleteMany({
+      where: {
+        module: {
+          courseId: id,
+        },
+      },
+    });
+
+    await this.prisma.courseModule.deleteMany({
+      where: {
+        courseId: id,
+      },
+    });
+
+    // Then update the course with new data
     return (await this.prisma.course.update({
       where: { id },
-      data: updateCourseDto,
+      data: {
+        ...courseData,
+        ...(modules &&
+          modules.length > 0 && {
+            modules: {
+              create: modules.map((module, index) => ({
+                title: module.title,
+                description: module.description,
+                order: module.order || index + 1,
+                ...(module.lessons &&
+                  module.lessons.length > 0 && {
+                    lessons: {
+                      create: module.lessons.map((lesson, lessonIndex) => ({
+                        title: lesson.title,
+                        description: lesson.description,
+                        contentType: lesson.contentType,
+                        contentUrl: lesson.contentUrl,
+                        order: lesson.order || lessonIndex + 1,
+                      })),
+                    },
+                  }),
+              })),
+            },
+          }),
+      },
       include: {
         instructor: {
           select: {
@@ -240,8 +393,16 @@ export class CoursesService {
           },
         },
         category: true,
+        modules: {
+          include: {
+            lessons: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
-    })) as CourseWithInstructorAndCategoryResponse;
+    })) as unknown as CourseWithInstructorAndCategoryResponse;
   }
 
   async remove(id: string, currentUser: UserResponse): Promise<CourseResponse> {
@@ -290,6 +451,71 @@ export class CoursesService {
     return {
       id: category.id,
       name: category.name,
+    };
+  }
+
+  async findRelated(
+    id: string,
+    limit: number,
+  ): Promise<CourseWithInstructorAndCategoryResponse[]> {
+    // First get the course to find its category
+    const course = await this.prisma.course.findUnique({
+      where: { id },
+      select: { categoryId: true },
+    });
+
+    if (!course) {
+      return [];
+    }
+
+    // Find other courses in the same category
+    return (await this.prisma.course.findMany({
+      where: {
+        categoryId: course.categoryId,
+        id: { not: id }, // Exclude the current course
+      },
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        instructor: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        category: true,
+        _count: {
+          select: {
+            enrollments: true,
+            reviews: true,
+          },
+        },
+      },
+    })) as unknown as CourseWithInstructorAndCategoryResponse[];
+  }
+
+  async getCourseCounts(id: string): Promise<{ enrollments: number; reviews: number }> {
+    const course = await this.prisma.course.findUnique({
+      where: { id },
+      select: {
+        _count: {
+          select: {
+            enrollments: true,
+            reviews: true,
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    return {
+      enrollments: course._count.enrollments,
+      reviews: course._count.reviews,
     };
   }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
 import { Subscription } from 'rxjs';
 
@@ -17,10 +18,13 @@ export class SharedNavbar implements OnInit, OnDestroy {
   user: any = null;
   showProfileDropdown = false;
   wishlistCount = 0; // You can connect this to your wishlist service later
+  cartCount = 0;
   private subscription: Subscription = new Subscription();
+  private cartSubscription: Subscription = new Subscription();
 
   constructor(
     private authService: AuthService,
+    private cartService: CartService,
     private router: Router,
     private toastService: ToastService
   ) {}
@@ -37,10 +41,16 @@ export class SharedNavbar implements OnInit, OnDestroy {
         this.wishlistCount = 0;
       }
     });
+
+    // Subscribe to cart changes
+    this.cartSubscription = this.cartService.cart$.subscribe(cart => {
+      this.cartCount = cart.length;
+    });
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
+    this.cartSubscription.unsubscribe();
   }
 
   toggleProfileDropdown() {
@@ -97,5 +107,9 @@ export class SharedNavbar implements OnInit, OnDestroy {
     const firstName = this.user.firstName || '';
     const lastName = this.user.lastName || '';
     return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase() || 'U';
+  }
+
+  goToCart() {
+    this.router.navigate(['/cart']);
   }
 }

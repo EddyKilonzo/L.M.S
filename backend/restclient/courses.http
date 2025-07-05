@@ -6,7 +6,7 @@
 ### Note: These endpoints require authentication
 ### First login to get access token, then use it in Authorization header
 
-### 1. Create a new course (requires INSTRUCTOR or ADMIN role)
+### 1. Create a new course with modules and lessons (requires INSTRUCTOR or ADMIN role)
 POST {{coursesUrl}}
 Authorization: Bearer your-access-token-here
 Content-Type: application/json
@@ -14,35 +14,65 @@ Content-Type: application/json
 {
   "title": "Introduction to Web Development",
   "description": "Learn the basics of HTML, CSS, and JavaScript",
+  "objectives": [
+    "Understand HTML structure and semantics",
+    "Style pages with CSS",
+    "Add interactivity with JavaScript"
+  ],
+  "prerequisites": [
+    "Basic computer skills",
+    "No prior programming experience required"
+  ],
+  "categoryId": "your-category-id-here",
+  "difficulty": "BEGINNER",
   "price": 99.99,
-  "category": "Programming",
-  "level": "BEGINNER",
-  "duration": 20,
-  "thumbnail": "https://example.com/thumbnail.jpg"
+  "imageUrl": "https://example.com/thumbnail.jpg",
+  "modules": [
+    {
+      "title": "HTML Fundamentals",
+      "description": "Learn the basics of HTML markup",
+      "order": 1,
+      "lessons": [
+        {
+          "title": "Introduction to HTML",
+          "description": "What is HTML and why we use it",
+          "contentType": "video",
+          "contentUrl": "https://example.com/video1.mp4",
+          "order": 1
+        },
+        {
+          "title": "HTML Structure",
+          "description": "Basic HTML document structure",
+          "contentType": "text",
+          "contentUrl": "https://example.com/lesson1.html",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "title": "CSS Styling",
+      "description": "Learn to style your HTML pages",
+      "order": 2,
+      "lessons": [
+        {
+          "title": "CSS Basics",
+          "description": "Introduction to CSS selectors and properties",
+          "contentType": "video",
+          "contentUrl": "https://example.com/video2.mp4",
+          "order": 1
+        }
+      ]
+    }
+  ]
 }
 
-### 2. Create another course
-POST {{coursesUrl}}
-Authorization: Bearer your-access-token-here
-Content-Type: application/json
-
-{
-  "title": "Advanced React Development",
-  "description": "Master React hooks, context, and advanced patterns",
-  "price": 149.99,
-  "category": "Programming",
-  "level": "ADVANCED",
-  "duration": 30,
-  "thumbnail": "https://example.com/react-thumbnail.jpg"
-}
-
-### 3. Get all courses
+### 2. Get all courses
 GET {{coursesUrl}}
 
-### 4. Get course by ID (replace with actual course ID)
+### 3. Get course by ID (replace with actual course ID)
 GET {{coursesUrl}}/course-id-here
 
-### 5. Update course
+### 4. Update course
 PATCH {{coursesUrl}}/course-id-here
 Authorization: Bearer your-access-token-here
 Content-Type: application/json
@@ -53,14 +83,14 @@ Content-Type: application/json
   "price": 129.99
 }
 
-### 6. Delete course
+### 5. Delete course
 DELETE {{coursesUrl}}/course-id-here
 Authorization: Bearer your-access-token-here
 
-### 7. Get non-existent course
+### 6. Get non-existent course
 GET {{coursesUrl}}/non-existent-id
 
-### 8. Create course with invalid data
+### 7. Create course with invalid data
 POST {{coursesUrl}}
 Authorization: Bearer your-access-token-here
 Content-Type: application/json

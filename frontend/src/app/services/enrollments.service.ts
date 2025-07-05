@@ -13,7 +13,19 @@ export class EnrollmentsService {
 
   enroll(courseId: string): Observable<any> {
     return this.http
-      .post(this.apiUrl, { courseId })
+      .post(`${this.apiUrl}/enroll/${courseId}`, {})
+      .pipe(catchError(this.handleError));
+  }
+
+  getMyEnrollments(): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/my-enrollments`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getCourseEnrollments(courseId: string): Observable<any> {
+    return this.http
+      .get(`${this.apiUrl}/course/${courseId}`)
       .pipe(catchError(this.handleError));
   }
 

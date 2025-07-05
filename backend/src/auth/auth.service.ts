@@ -55,6 +55,7 @@ export class AuthService {
           isVerified: true,
           about: true,
           profileProgress: true,
+          profileImage: true,
           createdAt: true,
         },
       });
@@ -115,6 +116,9 @@ export class AuthService {
           lastName: user.lastName,
           role: user.role,
           isVerified: user.isVerified,
+          about: user.about,
+          profileProgress: user.profileProgress,
+          profileImage: user.profileImage,
           createdAt: user.createdAt,
         },
       };
@@ -208,20 +212,44 @@ export class AuthService {
     email: string;
     role: string;
   }): Promise<UserResponse | null> {
+    console.log('AuthService.validateUser - payload:', payload);
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isVerified: true,
+        about: true,
+        profileProgress: true,
+        profileImage: true,
+        createdAt: true,
+      },
     });
-    if (!user) return null;
+    console.log('AuthService.validateUser - user from database:', user);
+    
+    if (!user) {
+      console.log('AuthService.validateUser - user not found in database');
+      return null;
+    }
 
-    return {
+    const userResponse = {
       id: user.id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
       isVerified: user.isVerified,
+      about: user.about,
+      profileProgress: user.profileProgress,
+      profileImage: user.profileImage,
       createdAt: user.createdAt,
     };
+    
+    console.log('AuthService.validateUser - returning user response:', userResponse);
+    return userResponse;
   }
 
   async verifyCode(email: string, code: string): Promise<{ message: string }> {
@@ -235,7 +263,7 @@ export class AuthService {
     if (user.verificationCodeExpiry < new Date()) {
       throw new BadRequestException('Verification code expired');
     }
-    
+
     // Update user verification status
     await this.prisma.user.update({
       where: { id: user.id },

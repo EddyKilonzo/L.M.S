@@ -4,7 +4,11 @@ import {
   IsOptional,
   IsEnum,
   IsBoolean,
+  IsNumber,
+  Min,
+  Max,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../../auth/dto';
 
@@ -69,7 +73,20 @@ export class UpdateUserDto {
     required: false,
   })
   @IsOptional()
+  @Transform(({ value }) => parseInt(value))
+  @IsNumber()
+  @Min(0)
+  @Max(100)
   profileProgress?: number;
+
+  @ApiProperty({
+    description: 'Profile image URL',
+    example: 'https://res.cloudinary.com/example/image/upload/v123/profile.jpg',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
 }
 
 export interface JwtPayload {

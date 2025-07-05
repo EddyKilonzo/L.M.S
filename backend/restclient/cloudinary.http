@@ -1,0 +1,86 @@
+### Cloudinary Upload Tests
+
+# Variables
+@baseUrl = http://localhost:3000
+@authToken = {{login.response.body.access_token}}
+@publicId = your_cloudinary_public_id_here
+@videoPublicId = your_cloudinary_video_public_id_here
+
+### Login to get auth token
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "instructor@example.com",
+  "password": "password123"
+}
+
+### Upload Image
+POST {{baseUrl}}/api/cloudinary/upload/image
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test-image.jpg"
+Content-Type: image/jpeg
+
+< ./test-image.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="folder"
+
+lms/courses
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Upload Video
+POST {{baseUrl}}/api/cloudinary/upload/video
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test-video.mp4"
+Content-Type: video/mp4
+
+< ./test-video.mp4
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="folder"
+
+lms/videos
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Upload PDF
+POST {{baseUrl}}/api/cloudinary/upload/pdf
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test-document.pdf"
+Content-Type: application/pdf
+
+< ./test-document.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="folder"
+
+lms/documents
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Get Upload Signature
+GET {{baseUrl}}/api/cloudinary/signature?folder=lms/images&resourceType=image
+Authorization: Bearer {{authToken}}
+
+### Get File Info
+GET {{baseUrl}}/api/cloudinary/info/{{publicId}}?resourceType=image
+Authorization: Bearer {{authToken}}
+
+### Create Video Thumbnail
+POST {{baseUrl}}/api/cloudinary/thumbnail/{{videoPublicId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "time": "00:00:05"
+}
+
+### Delete File
+DELETE {{baseUrl}}/api/cloudinary/{{publicId}}?resourceType=image
+Authorization: Bearer {{authToken}} 

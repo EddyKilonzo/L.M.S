@@ -70,8 +70,8 @@ export class CreateCourseDto {
   difficulty: Difficulty;
 
   @ApiProperty({
-    description: 'Course price',
-    example: 99.99,
+    description: 'Course price in KSH',
+    example: 9999.99,
   })
   @IsNumber()
   price: number;
@@ -84,6 +84,47 @@ export class CreateCourseDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @ApiProperty({
+    description: 'Course modules with lessons',
+    required: false,
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        description: { type: 'string' },
+        order: { type: 'number' },
+        lessons: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              description: { type: 'string' },
+              contentType: { type: 'string', enum: ['video', 'pdf', 'text'] },
+              contentUrl: { type: 'string' },
+              order: { type: 'number' },
+            },
+          },
+        },
+      },
+    },
+  })
+  @IsOptional()
+  @IsArray()
+  modules?: {
+    title: string;
+    description: string;
+    order: number;
+    lessons: {
+      title: string;
+      description: string;
+      contentType: 'video' | 'pdf' | 'text';
+      contentUrl?: string;
+      order: number;
+    }[];
+  }[];
 }
 
 export class UpdateCourseDto {
@@ -145,8 +186,8 @@ export class UpdateCourseDto {
   difficulty?: Difficulty;
 
   @ApiProperty({
-    description: 'Course price',
-    example: 99.99,
+    description: 'Course price in KSH',
+    example: 9999.99,
     required: false,
   })
   @IsOptional()

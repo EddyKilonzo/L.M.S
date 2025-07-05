@@ -23,6 +23,7 @@ model User {
   updatedAt       DateTime      @updatedAt
   about           String?
   profileProgress Int           @default(0)
+  profileImage    String?       // Cloudinary URL for profile image
   role            Role           @default(STUDENT) // Admin, Instructor, Student
   isVerified      Boolean        @default(false)
   resetPasswordToken String?
@@ -58,7 +59,8 @@ model Course {
   instructor       User            @relation(fields: [instructorId], references: [id])
   instructorId     String
   price            Float
-  imageUrl         String?
+  imageUrl         String?         // Course thumbnail image
+  imagePublicId    String?         // Cloudinary public ID for image
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
@@ -95,8 +97,13 @@ model Lesson {
   id          String   @id @default(uuid())
   title       String
   description String?
-  contentType String // e.g., 'video', 'pdf', 'text'
-  contentUrl  String?  // URL to video, PDF, or text content
+  contentType String   // 'video', 'pdf', 'text', 'image'
+  contentUrl  String?  // Cloudinary URL to video, PDF, or text content
+  contentPublicId String? // Cloudinary public ID for content
+  thumbnailUrl String? // Video thumbnail URL
+  thumbnailPublicId String? // Cloudinary public ID for thumbnail
+  fileSize    Int?     // File size in bytes
+  duration    Int?     // Video duration in seconds
   order       Int
   module      CourseModule @relation(fields: [moduleId], references: [id])
   moduleId    String

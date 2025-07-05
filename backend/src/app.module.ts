@@ -9,6 +9,9 @@ import { ContentModule } from './content/content.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { QuizzesModule } from './quizzes/quizzes.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
+import { CategoriesModule } from './categories/categories.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { AnalyticsModule } from './analytics/analytics.module';
     EnrollmentsModule,
     QuizzesModule,
     AnalyticsModule,
+    CloudinaryModule,
+    CategoriesModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

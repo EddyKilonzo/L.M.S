@@ -1,0 +1,473 @@
+<app-shared-navbar></app-shared-navbar>
+
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">{{ isEditing ? 'Edit Course' : 'Create New Course' }}</h1>
+          <p class="mt-2 text-gray-600">{{ isEditing ? 'Update your course with modules and lessons to help students learn effectively' : 'Build your course with modules and lessons to help students learn effectively' }}</p>
+        </div>
+        <button 
+          (click)="cancel()"
+          class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Course Creation Form -->
+    <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="space-y-8">
+      <!-- Basic Course Information -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-blue-100 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-900">Course Information</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Course Title *</label>
+            <input 
+              formControlName="title"
+              type="text" 
+              placeholder="Enter course title"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              [class.border-red-500]="courseForm.get('title')?.invalid && courseForm.get('title')?.touched">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+            <select 
+              formControlName="categoryId"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              [class.border-red-500]="courseForm.get('categoryId')?.invalid && courseForm.get('categoryId')?.touched">
+              <option value="">Select a category</option>
+              <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Difficulty Level *</label>
+            <select 
+              formControlName="difficulty"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              [class.border-red-500]="courseForm.get('difficulty')?.invalid && courseForm.get('difficulty')?.touched">
+              <option value="">Select difficulty</option>
+              <option value="BEGINNER">Beginner</option>
+              <option value="INTERMEDIATE">Intermediate</option>
+              <option value="ADVANCED">Advanced</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Price (KSH) *</label>
+            <input 
+              formControlName="price"
+              type="number" 
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              [class.border-red-500]="courseForm.get('price')?.invalid && courseForm.get('price')?.touched">
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Course Description *</label>
+          <textarea 
+            formControlName="description"
+            rows="4" 
+            placeholder="Describe what students will learn in this course..."
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+            [class.border-red-500]="courseForm.get('description')?.invalid && courseForm.get('description')?.touched"></textarea>
+        </div>
+      </div>
+
+      <!-- Course Objectives & Prerequisites -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-green-100 rounded-lg">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-900">Learning Objectives & Prerequisites</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Objectives -->
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <label class="block text-sm font-medium text-gray-700">Learning Objectives *</label>
+              <button 
+                type="button"
+                (click)="addObjective()"
+                class="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-1 rounded-lg transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div formArrayName="objectives" class="space-y-3">
+              <div *ngFor="let objective of objectives.controls; let i = index" class="flex gap-2">
+                <input 
+                  [formControlName]="i"
+                  type="text" 
+                  placeholder="Enter learning objective"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                  [class.border-red-500]="objective.invalid && objective.touched">
+                <button 
+                  type="button"
+                  (click)="removeObjective(i)"
+                  class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                  [disabled]="objectives.length === 1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Prerequisites -->
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <label class="block text-sm font-medium text-gray-700">Prerequisites *</label>
+              <button 
+                type="button"
+                (click)="addPrerequisite()"
+                class="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-1 rounded-lg transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div formArrayName="prerequisites" class="space-y-3">
+              <div *ngFor="let prerequisite of prerequisites.controls; let i = index" class="flex gap-2">
+                <input 
+                  [formControlName]="i"
+                  type="text" 
+                  placeholder="Enter prerequisite"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                  [class.border-red-500]="prerequisite.invalid && prerequisite.touched">
+                <button 
+                  type="button"
+                  (click)="removePrerequisite(i)"
+                  class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                  [disabled]="prerequisites.length === 1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Image -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-900">Course Image</h2>
+        </div>
+        
+        <div class="space-y-4">
+          <!-- File Upload Area -->
+          <div 
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
+            
+            <input 
+              type="file" 
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              class="hidden"
+              #fileInput>
+            
+            <div *ngIf="!selectedFile && !imagePreview" (click)="fileInput.click()">
+              <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              <p class="text-lg font-medium text-gray-700 mb-2">Upload Course Image</p>
+              <p class="text-sm text-gray-500">Drag and drop an image here, or click to browse</p>
+              <p class="text-xs text-gray-400 mt-2">PNG, JPG, GIF up to 10MB</p>
+            </div>
+            
+            <!-- Preview -->
+            <div *ngIf="selectedFile && imagePreview" class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <img [src]="imagePreview" alt="Preview" class="w-16 h-16 object-cover rounded-lg">
+                <div class="text-left">
+                  <p class="font-medium text-gray-700">{{ selectedFile.name }}</p>
+                  <p class="text-sm text-gray-500">{{ formatFileSize(selectedFile.size) }}</p>
+                  <p class="text-xs text-gray-400">{{ selectedFile.type }}</p>
+                </div>
+              </div>
+              
+              <button 
+                type="button"
+                (click)="removeFile()"
+                class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Error Message -->
+          <div *ngIf="fileError" class="text-red-600 text-sm flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ fileError }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Modules and Lessons -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+            Course Modules & Lessons
+          </h2>
+          <button 
+            type="button"
+            (click)="addModule()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add Module
+          </button>
+        </div>
+        
+        <div *ngIf="modules && modules.length > 0" formArrayName="modules" class="space-y-6">
+          <div *ngFor="let module of modules.controls; let moduleIndex = index" [formGroupName]="moduleIndex" class="border border-gray-200 rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-medium text-gray-900">Module {{ moduleIndex + 1 }}</h3>
+              <button 
+                type="button"
+                (click)="removeModule(moduleIndex)"
+                class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                [disabled]="modules.length === 1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Module Title *</label>
+                <input 
+                  formControlName="title"
+                  type="text" 
+                  placeholder="Enter module title"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  [class.border-red-500]="module.get('title')?.invalid && module.get('title')?.touched">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Order</label>
+                <input 
+                  formControlName="order"
+                  type="number" 
+                  [value]="moduleIndex + 1"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  readonly>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Module Description *</label>
+              <textarea 
+                formControlName="description"
+                rows="3" 
+                placeholder="Describe what this module covers..."
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                [class.border-red-500]="module.get('description')?.invalid && module.get('description')?.touched"></textarea>
+            </div>
+            
+            <!-- Lessons -->
+            <div class="border-t border-gray-200 pt-4">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-md font-medium text-gray-800">Lessons</h4>
+                <button 
+                  type="button"
+                  (click)="addLesson(moduleIndex)"
+                  class="px-3 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1 text-sm shadow-sm hover:shadow-md">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  Add Lesson
+                </button>
+              </div>
+              
+              <div *ngIf="getLessons(moduleIndex) && getLessons(moduleIndex).length > 0" formArrayName="lessons" class="space-y-4">
+                <div *ngFor="let lesson of getLessons(moduleIndex).controls; let lessonIndex = index" [formGroupName]="lessonIndex" class="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div class="flex items-center justify-between mb-3">
+                    <h5 class="text-sm font-medium text-gray-700">Lesson {{ lessonIndex + 1 }}</h5>
+                    <button 
+                      type="button"
+                      (click)="removeLesson(moduleIndex, lessonIndex)"
+                      class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
+                      [disabled]="getLessons(moduleIndex).length === 1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Lesson Title *</label>
+                      <input 
+                        formControlName="title"
+                        type="text" 
+                        placeholder="Enter lesson title"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                        [class.border-red-500]="lesson.get('title')?.invalid && lesson.get('title')?.touched">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Content Type *</label>
+                      <select 
+                        formControlName="contentType"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm">
+                        <option value="video">Video</option>
+                        <option value="pdf">PDF</option>
+                        <option value="image">Image</option>
+                        <option value="text">Text</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Lesson Description *</label>
+                    <textarea 
+                      formControlName="description"
+                      rows="2" 
+                      placeholder="Describe this lesson..."
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none text-sm"
+                      [class.border-red-500]="lesson.get('description')?.invalid && lesson.get('description')?.touched"></textarea>
+                  </div>
+                  
+                  <!-- Lesson Content Upload -->
+                  <div class="mb-3">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Lesson Content</label>
+                    
+                    <!-- File Upload Area -->
+                    <div 
+                      (dragover)="onLessonDragOver($event, moduleIndex, lessonIndex)"
+                      (dragleave)="onLessonDragLeave($event, moduleIndex, lessonIndex)"
+                      (drop)="onLessonDrop($event, moduleIndex, lessonIndex)"
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
+                      
+                      <input 
+                        type="file" 
+                        [accept]="lesson.get('contentType')?.value === 'video' ? 'video/*' : lesson.get('contentType')?.value === 'pdf' ? 'application/pdf' : 'image/*'"
+                        (change)="onLessonFileSelected($event, moduleIndex, lessonIndex)"
+                        class="hidden"
+                        #lessonFileInput>
+                      
+                      <div *ngIf="!selectedLessonFiles[getLessonFileKey(moduleIndex, lessonIndex)] && !lessonFilePreviews[getLessonFileKey(moduleIndex, lessonIndex)]" (click)="lessonFileInput.click()">
+                        <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-sm font-medium text-gray-700 mb-1">Upload {{ lesson.get('contentType')?.value === 'video' ? 'Video' : lesson.get('contentType')?.value === 'pdf' ? 'PDF' : 'Image' }}</p>
+                        <p class="text-xs text-gray-500">Drag and drop or click to browse</p>
+                        <p class="text-xs text-gray-400 mt-1">
+                          {{ lesson.get('contentType')?.value === 'video' ? 'MP4, AVI, MOV, WMV, FLV, WebM up to 500MB' : 
+                             lesson.get('contentType')?.value === 'pdf' ? 'PDF up to 50MB' : 
+                             'PNG, JPG, GIF, WebP up to 10MB' }}
+                        </p>
+                      </div>
+                      
+                      <!-- File Preview -->
+                      <div *ngIf="selectedLessonFiles[getLessonFileKey(moduleIndex, lessonIndex)] && lessonFilePreviews[getLessonFileKey(moduleIndex, lessonIndex)]" class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                          <div *ngIf="lesson.get('contentType')?.value === 'image'" class="w-12 h-12">
+                            <img [src]="lessonFilePreviews[getLessonFileKey(moduleIndex, lessonIndex)]" alt="Preview" class="w-full h-full object-cover rounded">
+                          </div>
+                          <div *ngIf="lesson.get('contentType')?.value !== 'image'" class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                          </div>
+                          <div class="text-left">
+                            <p class="text-sm font-medium text-gray-700">{{ selectedLessonFiles[getLessonFileKey(moduleIndex, lessonIndex)].name }}</p>
+                            <p class="text-xs text-gray-500">{{ formatFileSize(selectedLessonFiles[getLessonFileKey(moduleIndex, lessonIndex)].size) }}</p>
+                            <p class="text-xs text-gray-400">{{ selectedLessonFiles[getLessonFileKey(moduleIndex, lessonIndex)].type }}</p>
+                          </div>
+                        </div>
+                        
+                        <button 
+                          type="button"
+                          (click)="removeLessonFile(moduleIndex, lessonIndex)"
+                          class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div *ngIf="lessonFileErrors[getLessonFileKey(moduleIndex, lessonIndex)]" class="text-red-600 text-xs flex items-center gap-1 mt-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      {{ lessonFileErrors[getLessonFileKey(moduleIndex, lessonIndex)] }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="flex gap-4 pt-6">
+        <button 
+          type="submit" 
+          [disabled]="isLoading || courseForm.invalid"
+          class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          <svg *ngIf="isLoading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <svg *ngIf="!isLoading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          {{ isLoading ? (isEditing ? 'Updating Course...' : 'Creating Course...') : (isEditing ? 'Update Course' : 'Create Course') }}
+        </button>
+        <button 
+          type="button" 
+          (click)="cancel()"
+          class="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-200 shadow-md hover:shadow-lg">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

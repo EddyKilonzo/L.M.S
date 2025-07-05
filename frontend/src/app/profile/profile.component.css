@@ -312,6 +312,32 @@ aside nav a:hover {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
+/* Access Course Button */
+.access-course-btn {
+  color: white !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background-color: #16a34a !important;
+}
+
+.access-course-btn:hover {
+  color: white !important;
+  background-color: #15803d !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(34, 197, 94, 0.3);
+}
+
+/* Force text visibility */
+.course-card .access-course-btn {
+  color: white !important;
+  background-color: #16a34a !important;
+}
+
+.course-card .access-course-btn:hover {
+  color: white !important;
+  background-color: #15803d !important;
+}
+
 /* Courses Controls - Enhanced */
 .courses-controls {
   background: white;

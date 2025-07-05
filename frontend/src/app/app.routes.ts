@@ -4,9 +4,13 @@ import { Signup } from '../signup/signup';
 import { Login } from './login/login';
 import { CourseCategoryComponent } from './course-category/course-category.component';
 import { CoursePageComponent } from './course-page/course-page.component';
+import { CourseLearningComponent } from './course-learning/course-learning.component';
 import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { CourseCreationComponent } from './course-creation/course-creation.component';
+import { CartComponent } from './cart/cart.component';
+import { CheckoutComponent } from './checkout/checkout.component';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
@@ -16,5 +20,10 @@ export const routes: Routes = [
   { path: 'verify-email', component: VerifyEmailComponent },
   { path: 'courses', component: CourseCategoryComponent },
   { path: 'course/:id', component: CoursePageComponent },
+  { path: 'learn/:id', component: CourseLearningComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'course-creation', component: CourseCreationComponent },
+  { path: 'course-creation/:id', component: CourseCreationComponent },
+  { path: 'cart', component: CartComponent },
+  { path: 'checkout', component: CheckoutComponent },
 ];

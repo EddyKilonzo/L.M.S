@@ -18,6 +18,8 @@ export interface UserResponse {
   about?: string | null;
   /** Profile completion percentage */
   profileProgress?: number;
+  /** Profile image URL */
+  profileImage?: string | null;
   /** User creation date */
   createdAt: Date;
 }
@@ -60,6 +62,12 @@ export interface CourseWithInstructorAndCategoryResponse
   category: {
     id: string;
     name: string;
+  };
+  averageRating?: number;
+  totalReviews?: number;
+  _count?: {
+    enrollments: number;
+    reviews: number;
   };
 }
 

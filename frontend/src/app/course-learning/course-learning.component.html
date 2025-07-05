@@ -1,0 +1,224 @@
+<app-shared-navbar></app-shared-navbar>
+
+<div class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto p-4 md:p-8 flex flex-col lg:flex-row gap-8">
+    <!-- Main Content Area -->
+    <main class="flex-1 order-1 lg:order-none">
+      <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <!-- Lesson Viewer -->
+        <div *ngIf="currentLesson">
+          <div *ngIf="currentLesson.contentType === 'video'">
+            <video *ngIf="currentLesson.contentUrl" controls class="w-full rounded-lg mb-4" (ended)="onVideoEnded()">
+              <source [src]="currentLesson.contentUrl" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div *ngIf="!currentLesson.contentUrl" class="text-gray-500">Video not available.</div>
+          </div>
+          <div *ngIf="currentLesson.contentType === 'pdf'">
+            <iframe *ngIf="currentLesson.contentUrl" [src]="currentLesson.contentUrl" class="w-full h-[600px] rounded-lg mb-4" frameborder="0"></iframe>
+            <div *ngIf="!currentLesson.contentUrl" class="text-gray-500">PDF not available.</div>
+          </div>
+          <div *ngIf="currentLesson.contentType === 'text'">
+            <div class="prose max-w-none" [innerHTML]="currentLesson.contentUrl"></div>
+          </div>
+          
+          <!-- Lesson Completion Button -->
+          <div *ngIf="user?.role === 'STUDENT' && !isCourseCompleted" class="mt-6 flex justify-center">
+            <button 
+              (click)="markLessonComplete()"
+              [disabled]="isMarkingComplete"
+              class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+              <div *ngIf="isMarkingComplete" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <svg *ngIf="!isMarkingComplete" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              {{ isMarkingComplete ? 'Marking Complete...' : 'Mark as Complete' }}
+            </button>
+          </div>
+          
+          <!-- Course Completion Message -->
+          <div *ngIf="user?.role === 'STUDENT' && isCourseCompleted" class="mt-6 flex justify-center">
+            <div class="bg-blue-600 text-white px-8 py-4 rounded-lg flex items-center gap-3">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div class="text-center">
+                <div class="font-semibold text-lg">🎉 Congratulations!</div>
+                <div class="text-sm">You've successfully completed this course!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Course Details Below Video/PDF/Text -->
+        <div class="flex flex-col md:flex-row gap-8 mt-6">
+          <div class="flex-1">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ course?.title }}</h1>
+            <p class="text-gray-700 mb-4">{{ course?.description }}</p>
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Key Learning Objectives</h2>
+            <ul class="list-disc ml-6 text-gray-700 mb-4">
+              <li *ngFor="let obj of course?.objectives">{{ obj }}</li>
+            </ul>
+          </div>
+          <div class="w-full md:w-80 flex-shrink-0">
+            <img [src]="course?.imageUrl || '/assets/images/course-image2.jpg'" alt="Course image" class="rounded-xl w-full object-cover mb-4">
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructor Info -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 mb-8 border-l-4 border-blue-700">
+        <h2 class="text-lg font-bold text-gray-800 mb-2">Instructor</h2>
+        <div class="flex items-center gap-4">
+          <img [src]="course?.instructor?.profileImage || '/assets/images/student1-removebg-preview.png'" alt="Instructor" class="w-16 h-16 rounded-full object-cover border-2 border-blue-700">
+          <div>
+            <div class="font-semibold text-blue-700">{{ course?.instructor?.firstName }} {{ course?.instructor?.lastName }}</div>
+            <div class="text-sm text-gray-500 mb-1">{{ course?.instructor?.title || 'Instructor' }}</div>
+            <div class="text-xs text-gray-600">{{ course?.instructor?.bio || 'No bio available.' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- More Courses by Instructor -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">More Courses by {{ course?.instructor?.firstName }} {{ course?.instructor?.lastName }}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div *ngFor="let c of moreCourses" class="bg-gray-50 rounded-xl p-4 shadow hover:shadow-lg transition">
+            <img [src]="c.imageUrl || '/assets/images/course-image2.jpg'" alt="Course image" class="rounded-lg w-full h-32 object-cover mb-2">
+            <div class="font-semibold text-gray-800">{{ c.title }}</div>
+            <div class="text-xs text-gray-500 mb-1">{{ c.category?.name }}</div>
+            <div class="text-sm text-blue-700 font-bold">KSH {{ c.price }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Learner Reviews -->
+      <div class="bg-white rounded-2xl shadow-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-gray-800">Learner Reviews</h2>
+          <!-- Add Review Button - Only for completed students who haven't reviewed -->
+          <button 
+            *ngIf="user?.role === 'STUDENT' && isCourseCompleted && !userHasReviewed && !showReviewForm"
+            (click)="toggleReviewForm()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+            Add Review
+          </button>
+        </div>
+
+        <!-- Review Form -->
+        <div *ngIf="showReviewForm" class="bg-gray-50 rounded-lg p-4 mb-6">
+          <h3 class="text-md font-semibold text-gray-800 mb-3">Write Your Review</h3>
+          
+          <!-- Rating Stars -->
+          <div class="flex items-center mb-3">
+            <span class="text-sm text-gray-700 mr-2">Rating:</span>
+            <div class="flex gap-1">
+              <ng-container *ngFor="let i of [1,2,3,4,5]">
+                <button 
+                  (click)="setReviewRating(i)"
+                  class="text-2xl transition-colors"
+                  [ngClass]="{'text-yellow-400': i <= newReviewRating, 'text-gray-300': i > newReviewRating}">
+                  ★
+                </button>
+              </ng-container>
+            </div>
+            <span class="ml-2 text-sm text-gray-600">{{ newReviewRating }}/5</span>
+          </div>
+          
+          <!-- Review Comment -->
+          <div class="mb-3">
+            <label class="block text-sm text-gray-700 mb-1">Your Review:</label>
+            <textarea 
+              [(ngModel)]="newReviewComment"
+              rows="4"
+              placeholder="Share your experience with this course..."
+              class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none">
+            </textarea>
+          </div>
+          
+          <!-- Submit/Cancel Buttons -->
+          <div class="flex gap-2">
+            <button 
+              (click)="submitReview()"
+              [disabled]="submittingReview || !newReviewComment.trim()"
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <span *ngIf="submittingReview">Submitting...</span>
+              <span *ngIf="!submittingReview">Submit Review</span>
+            </button>
+            <button 
+              (click)="toggleReviewForm()"
+              [disabled]="submittingReview"
+              class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50">
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div *ngIf="loadingReviews" class="text-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p class="text-gray-600 mt-2">Loading reviews...</p>
+        </div>
+        <div *ngIf="!loadingReviews && reviews.length === 0" class="text-center py-8">
+          <p class="text-gray-600">No reviews yet. Be the first to review this course!</p>
+        </div>
+        <div *ngFor="let review of reviews" class="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-semibold text-gray-800">{{ review.student.firstName }} {{ review.student.lastName }}</span>
+            <span class="text-yellow-500">
+              <ng-container *ngFor="let i of [1,2,3,4,5]">
+                <span *ngIf="i <= review.rating">&#9733;</span>
+                <span *ngIf="i > review.rating">&#9734;</span>
+              </ng-container>
+            </span>
+            <span class="text-xs text-gray-400">{{ review.createdAt | date:'shortDate' }}</span>
+          </div>
+          <div class="text-gray-700">{{ review.comment || 'No comment provided' }}</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Sidebar: Course Progress & Navigation (Right Side, Accordion) -->
+    <aside class="w-full lg:w-1/4 bg-white rounded-2xl shadow-xl p-6 mb-8 lg:mb-0 flex-shrink-0 order-2 lg:order-none">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Course Progress</h2>
+      
+      <!-- Overall Progress Bar -->
+      <div *ngIf="courseProgress && user?.role === 'STUDENT'" class="mb-6 p-4 bg-blue-50 rounded-lg">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">Overall Progress</span>
+          <span class="text-sm text-gray-500">{{ courseProgress.progress }}%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+               [style.width.%]="courseProgress.progress"></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500 mt-1">
+          <span>{{ courseProgress.completedLessons }} completed</span>
+          <span>{{ courseProgress.totalLessons }} total</span>
+        </div>
+      </div>
+      <ul class="space-y-2">
+        <li *ngFor="let module of course?.modules; let idx = index">
+          <button (click)="toggleModule(idx)"
+            class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100 transition mb-1">
+            <span>Module: {{ module.title }}</span>
+            <svg [ngClass]="{'transform rotate-90': openModuleIndex === idx}" class="w-4 h-4 ml-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <ul *ngIf="openModuleIndex === idx" class="ml-4 mt-1 space-y-1">
+            <li *ngFor="let lesson of module.lessons">
+              <button (click)="selectLesson(lesson)"
+                [class]="currentLesson?.id === lesson.id ? 'text-blue-700 font-bold' : 'text-gray-700'"
+                class="text-left w-full hover:text-blue-600 transition-colors text-sm py-1">
+                <span *ngIf="lesson.contentType === 'video'">🎬</span>
+                <span *ngIf="lesson.contentType === 'pdf'">📄</span>
+                <span *ngIf="lesson.contentType === 'text'">📝</span>
+                {{ lesson.title }}
+              </button>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+  </div>
+</div> 

@@ -1,7 +1,76 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  objectives: string[];
+  prerequisites: string[];
+  categoryId: string;
+  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  price: number;
+  imageUrl?: string;
+  instructor: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    profileImage?: string;
+    about?: string;
+  };
+  category: {
+    id: string;
+    name: string;
+  };
+  modules: Array<{
+    id: string;
+    title: string;
+    description: string;
+    order: number;
+    lessons: Array<{
+      id: string;
+      title: string;
+      description: string;
+      contentType: 'video' | 'pdf' | 'text';
+      contentUrl?: string;
+      order: number;
+    }>;
+  }>;
+  _count: {
+    reviews: number;
+    enrollments: number;
+  };
+  averageRating?: number;
+  totalReviews?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCourseData {
+  title: string;
+  description: string;
+  objectives: string[];
+  prerequisites: string[];
+  categoryId: string;
+  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  price: number;
+  imageUrl?: string;
+  modules: {
+    title: string;
+    description: string;
+    order: number;
+    lessons: {
+      title: string;
+      description: string;
+      contentType: 'video' | 'pdf' | 'text';
+      contentUrl?: string;
+      order: number;
+    }[];
+  }[];
+}
 
 @Injectable({
   providedIn: 'root',
@@ -11,20 +80,69 @@ export class CoursesService {
 
   constructor(private http: HttpClient) {}
 
-  getCourses(): Observable<any> {
-    return this.http.get(this.apiUrl).pipe(catchError(this.handleError));
-  }
-
-  getCourse(id: string): Observable<any> {
+  getCourses(params: HttpParams = new HttpParams()): Observable<Course[]> {
     return this.http
-      .get(`${this.apiUrl}/${id}`)
+      .get<Course[]>(this.apiUrl, { params })
       .pipe(catchError(this.handleError));
   }
 
-  private handleError(error: any) {
+  getCourse(id: string): Observable<Course> {
+    return this.http
+      .get<Course>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getRelatedCourses(courseId: string): Observable<Course[]> {
+    return this.http
+      .get<Course[]>(`${this.apiUrl}/${courseId}/related`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createCourse(courseData: CreateCourseData): Observable<Course> {
+    return this.http
+      .post<Course>(this.apiUrl, courseData)
+      .pipe(catchError(this.handleError));
+  }
+
+  updateCourse(
+    id: string,
+    courseData: Partial<CreateCourseData>
+  ): Observable<Course> {
+    return this.http
+      .patch<Course>(`${this.apiUrl}/${id}`, courseData)
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteCourse(id: string): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getMyCourses(): Observable<Course[]> {
+    return this.http
+      .get<Course[]>(`${this.apiUrl}/my-courses`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getCoursesByInstructor(instructorId: string): Observable<Course[]> {
+    return this.http
+      .get<Course[]>(`${this.apiUrl}/instructor/${instructorId}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Fetches the enrollments and reviews count for a course by ID.
+   * Assumes backend endpoint GET /api/courses/:id/counts returns { enrollments, reviews }
+   */
+  getCourseCounts(courseId: string): Observable<{ enrollments: number; reviews: number }> {
+    return this.http.get<{ enrollments: number; reviews: number }>(`${this.apiUrl}/${courseId}/counts`)
+      .pipe(catchError(this.handleError));
+  }
+
+  private handleError(error: HttpErrorResponse) {
     console.error('An error occurred', error);
 
-    // Provide more specific error messages
     if (error.status === 0) {
       return throwError(
         () =>
@@ -36,15 +154,17 @@ export class CoursesService {
 
     if (error.status === 401) {
       return throwError(
-        () =>
-          new Error(
-            'Please log in to access this resource.'
-          )
+        () => new Error('Please log in to access this resource.')
       );
     }
 
     if (error.status === 403) {
-      return throwError(() => new Error('Access denied. You do not have permission to perform this action.'));
+      return throwError(
+        () =>
+          new Error(
+            'Access denied. You do not have permission to perform this action.'
+          )
+      );
     }
 
     if (error.status === 404) {

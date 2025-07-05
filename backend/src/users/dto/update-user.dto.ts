@@ -21,4 +21,9 @@ export class UpdateUserDto {
   @IsNumber()
   @IsOptional()
   profileProgress?: number;
+
+  @ApiProperty({ description: 'Profile image URL' })
+  @IsString()
+  @IsOptional()
+  profileImage?: string;
 }

@@ -1,0 +1,36 @@
+/* Additional custom styles for checkout component */
+.sticky {
+  position: sticky;
+  top: 2rem;
+}
+
+/* Custom radio/tab styling for payment methods */
+button[ngClass] {
+  outline: none;
+  box-shadow: none;
+}
+
+input[type="radio"] {
+  accent-color: #2563eb;
+}
+
+/* Smooth transitions */
+.transition-colors {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Coupon input spacing */
+.coupon-input {
+  min-width: 0;
+} 

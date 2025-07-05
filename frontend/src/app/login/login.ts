@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { SharedNavbar } from '../shared/navbar/navbar.component';
 import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterModule, SharedNavbar, FormsModule],
+  imports: [RouterModule, SharedNavbar, FormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })

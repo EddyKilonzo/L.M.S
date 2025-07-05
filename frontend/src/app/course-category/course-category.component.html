@@ -1,73 +1,103 @@
 <app-shared-navbar></app-shared-navbar>
-<div class="bg-secondary">
-  <div class="container mx-auto p-4 md:p-8">
+<div class="course-category-page">
+  <div class="container mx-auto">
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-primary">Design Courses</h1>
-      <p class="text-dark-gray">All Development Courses</p>
+    <div class="section-header">
+      <div>
+        <h1 class="section-title">All Courses</h1>
+        <p class="text-dark-gray">Discover courses from our expert instructors</p>
+      </div>
     </div>
 
-    <div class="flex flex-col md:flex-row">
+    <div class="flex flex-col md:flex-row gap-8">
       <!-- Sidebar -->
-      <aside class="w-full md:w-1/4 pr-0 md:pr-8 mb-8 md:mb-0">
-        <button class="w-full bg-white border border-border-color text-dark py-2 px-4 rounded-lg mb-6 flex items-center justify-between">
-          <span>Filter</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M3 8h18M3 12h18M3 16h18M3 20h18"></path></svg>
-        </button>
+      <aside class="w-full md:w-1/4">
+        <div class="sidebar-card">
+          <div class="filter-header">
+            <span>Filter Courses</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M3 8h18M3 12h18M3 16h18M3 20h18"></path></svg>
+          </div>
 
-        <!-- Filters -->
-        <div class="space-y-4">
-          <div class="bg-white rounded-lg shadow-md">
-            <h3 (click)="toggleFilter('rating')" class="font-bold text-dark p-4 flex justify-between items-center cursor-pointer">
-              <span>Rating</span>
-              <svg class="w-6 h-6 transform transition-transform duration-300 text-dark-gray" [class.rotate-180]="!openFilters['rating']" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </h3>
-            <div *ngIf="openFilters['rating']" class="p-4 border-t border-border-color">
-              <div class="space-y-2">
-                <label class="flex items-center" *ngFor="let i of [5,4,3,2,1]">
-                  <input type="radio" name="rating" class="form-radio text-primary">
-                  <span class="ml-2 text-dark-gray flex">
-                    <span class="text-yellow-500" *ngFor="let j of [].constructor(i)">★</span>
-                    <span class="text-gray-300" *ngFor="let j of [].constructor(5-i)">★</span>
-                  </span>
-                </label>
+          <!-- Filters -->
+          <div class="space-y-4 p-4">
+            <!-- Category Filter -->
+            <div class="filter-section">
+              <h3 (click)="toggleFilter('category')" class="filter-section-header">
+                <span>Category</span>
+                <svg [class.rotate-180]="!openFilters['category']" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </h3>
+              <div *ngIf="openFilters['category']" class="filter-section-content">
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="radio" name="category" value="" [(ngModel)]="selectedCategory" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">All Categories</span>
+                  </label>
+                  <label class="flex items-center" *ngFor="let category of categories">
+                    <input type="radio" name="category" [value]="category.id" [(ngModel)]="selectedCategory" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">{{ category.name }}</span>
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="bg-white rounded-lg shadow-md">
-            <h3 (click)="toggleFilter('chapters')" class="font-bold text-dark p-4 flex justify-between items-center cursor-pointer">
-              <span>Number of Chapters</span>
-              <svg class="w-6 h-6 transform transition-transform duration-300 text-dark-gray" [class.rotate-180]="!openFilters['chapters']" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </h3>
-            <div *ngIf="openFilters['chapters']" class="p-4 border-t border-border-color">
-              <div class="space-y-2">
-                <label class="flex items-center"><input type="checkbox" class="form-checkbox text-primary rounded"> <span class="ml-2 text-dark-gray">1-10</span></label>
-                <label class="flex items-center"><input type="checkbox" class="form-checkbox text-primary rounded"> <span class="ml-2 text-dark-gray">10-15</span></label>
-                <label class="flex items-center"><input type="checkbox" class="form-checkbox text-primary rounded" checked> <span class="ml-2 text-dark-gray">15-20</span></label>
-                <label class="flex items-center"><input type="checkbox" class="form-checkbox text-primary rounded"> <span class="ml-2 text-dark-gray">20-25</span></label>
+            <!-- Difficulty Filter -->
+            <div class="filter-section">
+              <h3 (click)="toggleFilter('difficulty')" class="filter-section-header">
+                <span>Difficulty</span>
+                <svg [class.rotate-180]="!openFilters['difficulty']" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </h3>
+              <div *ngIf="openFilters['difficulty']" class="filter-section-content">
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="radio" name="difficulty" value="" [(ngModel)]="selectedDifficulty" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">All Levels</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" name="difficulty" value="BEGINNER" [(ngModel)]="selectedDifficulty" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">Beginner</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" name="difficulty" value="INTERMEDIATE" [(ngModel)]="selectedDifficulty" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">Intermediate</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" name="difficulty" value="ADVANCED" [(ngModel)]="selectedDifficulty" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">Advanced</span>
+                  </label>
+                </div>
               </div>
-              <a href="#" class="text-primary mt-2 inline-block">See More</a>
             </div>
-          </div>
 
-          <div class="bg-white rounded-lg shadow-md">
-            <h3 (click)="toggleFilter('price')" class="font-bold text-dark p-4 flex justify-between items-center cursor-pointer">
-              <span>Price</span>
-              <svg class="w-6 h-6 transform transition-transform duration-300 text-dark-gray" [class.rotate-180]="!openFilters['price']" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </h3>
-            <div *ngIf="openFilters['price']" class="p-4 border-t border-border-color">
-              <!-- Price filter content here -->
-            </div>
-          </div>
-
-          <div class="bg-white rounded-lg shadow-md">
-            <h3 (click)="toggleFilter('category')" class="font-bold text-dark p-4 flex justify-between items-center cursor-pointer">
-              <span>Category</span>
-              <svg class="w-6 h-6 transform transition-transform duration-300 text-dark-gray" [class.rotate-180]="!openFilters['category']" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </h3>
-            <div *ngIf="openFilters['category']" class="p-4 border-t border-border-color">
-              <!-- Category filter content here -->
+            <!-- Price Filter -->
+            <div class="filter-section">
+              <h3 (click)="toggleFilter('price')" class="filter-section-header">
+                <span>Price</span>
+                <svg [class.rotate-180]="!openFilters['price']" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </h3>
+              <div *ngIf="openFilters['price']" class="filter-section-content">
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="radio" name="price" value="" [(ngModel)]="selectedPriceRange" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">All Prices</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" name="price" value="0-1000" [(ngModel)]="selectedPriceRange" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">Under KSH 1,000</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" name="price" value="1000-5000" [(ngModel)]="selectedPriceRange" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">KSH 1,000 - 5,000</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" name="price" value="5000-10000" [(ngModel)]="selectedPriceRange" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">KSH 5,000 - 10,000</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" name="price" value="10000-" [(ngModel)]="selectedPriceRange" class="form-radio text-blue-600">
+                    <span class="ml-2 text-gray-700">Over KSH 10,000</span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -75,71 +105,112 @@
 
       <!-- Main Content -->
       <main class="w-full md:w-3/4">
-        <!-- Search -->
-        <div class="flex justify-end mb-4">
-          <div class="relative w-full max-w-xs">
-            <input type="text" placeholder="Search courses..." class="w-full p-2 pl-10 border-none rounded-lg bg-white text-dark-gray focus:outline-none focus:ring-2 focus:ring-primary shadow-md">
-            <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          </div>
-        </div>
-
-        <!-- Course Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div *ngFor="let course of courses" class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105">
-            <img [src]="course.image" alt="{{ course.title }}" class="w-full h-48 object-cover rounded-t-lg">
-            <div class="p-4">
-              <h3 class="font-bold text-lg mb-2 text-dark">{{ course.title }}</h3>
-              <p class="text-sm text-dark-gray mb-2">{{ course.author }}</p>
-              <div class="flex items-center text-sm text-dark-gray mb-2">
-                <span class="font-bold text-dark mr-1">{{ course.rating }}</span>
-                <div class="flex items-center">
-                  <svg *ngFor="let i of [1,2,3,4]" class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                  <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                </div>
-                <span class="ml-1">({{ course.reviews }})</span>
-              </div>
-              <p class="text-lg font-bold text-dark">${{ course.price }}</p>
+        <div class="main-content-card">
+          <!-- Search -->
+          <div class="flex justify-end mb-6">
+            <div class="relative w-full max-w-xs search-container">
+              <input 
+                type="text" 
+                placeholder="Search courses..." 
+                [(ngModel)]="searchTerm"
+                class="w-full p-3 pl-10 border-none rounded-lg bg-transparent text-gray-700 focus:outline-none form-input">
+              <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
           </div>
-        </div>
 
-        <!-- Pagination -->
-        <div class="flex justify-center mt-8">
-          <nav class="flex items-center space-x-2">
-            <a href="#" class="px-3 py-1 border border-border-color rounded-md"><</a>
-            <a href="#" class="px-3 py-1 border border-border-color rounded-md bg-primary text-white">1</a>
-            <a href="#" class="px-3 py-1 border border-border-color rounded-md">2</a>
-            <a href="#" class="px-3 py-1 border border-border-color rounded-md">3</a>
-            <a href="#" class="px-3 py-1 border border-border-color rounded-md">></a>
-          </nav>
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+            <div class="loading-spinner"></div>
+          </div>
+
+          <!-- Course Grid -->
+          <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div *ngFor="let course of filteredCourses">
+              <a class="course-card block no-underline" [routerLink]="['/course', course.id]" style="cursor:pointer;">
+                <img [src]="course.imageUrl || '/assets/images/course-image2.jpg'" alt="{{ course.title }}" class="w-full h-48 object-cover">
+                <div class="p-6">
+                  <h3 class="font-bold text-lg mb-2 text-gray-800">{{ course.title }}</h3>
+                  <p class="text-sm text-gray-600 mb-2">{{ getInstructorName(course.instructor) }}</p>
+                  <p class="text-xs text-gray-500 mb-2">{{ course.category.name }} • {{ course.difficulty }}</p>
+                  <div class="flex items-center text-sm text-gray-600 mb-2">
+                    <span class="font-bold text-gray-800 mr-1">{{ getCourseRating(course) | number:'1.1-1' }}</span>
+                    <div class="flex items-center">
+                      <ng-container *ngFor="let i of [1,2,3,4,5]">
+                        <svg *ngIf="i <= Math.round(getCourseRating(course))" class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <svg *ngIf="i > Math.round(getCourseRating(course))" class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                      </ng-container>
+                    </div>
+                    <span class="ml-1">({{ course.totalReviews || 0 }})</span>
+                  </div>
+                  <div class="flex items-center text-xs text-gray-500 mb-3">
+                    <span class="mr-3">{{ getCourseLectures(course) }} lectures</span>
+                    <span>{{ getCourseHours(course) }} hours</span>
+                  </div>
+                  <p class="text-lg font-bold text-gray-800">KSH {{ course.price }}</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- No Results -->
+          <div *ngIf="!isLoading && filteredCourses.length === 0" class="text-center py-12">
+            <p class="text-gray-600 text-lg">No courses found matching your criteria.</p>
+          </div>
+
+          <!-- Pagination -->
+          <div *ngIf="!isLoading && filteredCourses.length > 0" class="mt-8">
+            <div class="pagination-container">
+              <button 
+                (click)="currentPage = currentPage - 1" 
+                [disabled]="currentPage === 1"
+                class="pagination-button">
+                &lt;
+              </button>
+              <button 
+                *ngFor="let page of [].constructor(totalPages); let i = index" 
+                (click)="currentPage = i + 1" 
+                [ngClass]="{'active': currentPage === i + 1}"
+                class="pagination-button">
+                {{ i + 1 }}
+              </button>
+              <button 
+                (click)="currentPage = currentPage + 1" 
+                [disabled]="currentPage === totalPages"
+                class="pagination-button">
+                &gt;
+              </button>
+            </div>
+          </div>
         </div>
       </main>
     </div>
 
-    <!-- Popular Mentors -->
+    <!-- Popular Instructors -->
     <div class="mt-16">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold text-primary">Popular Mentors</h2>
-        <nav class="flex items-center space-x-2">
-          <button (click)="prevMentorPage()" [disabled]="mentorCurrentPage === 1" class="px-3 py-1 border border-border-color rounded-md disabled:opacity-50">&lt;</button>
+      <div class="section-header">
+        <h2 class="section-title">Popular Instructors</h2>
+        <div class="pagination-container">
+          <button (click)="prevMentorPage()" [disabled]="mentorCurrentPage === 1" class="pagination-button">&lt;</button>
           <button *ngFor="let page of [].constructor(totalMentorPages); let i = index" 
                   (click)="goToMentorPage(i + 1)" 
-                  [ngClass]="{'bg-primary text-white': mentorCurrentPage === i + 1, 'bg-white': mentorCurrentPage !== i + 1}"
-                  class="px-3 py-1 border border-border-color rounded-md">
+                  [ngClass]="{'active': mentorCurrentPage === i + 1}"
+                  class="pagination-button">
             {{ i + 1 }}
           </button>
-          <button (click)="nextMentorPage()" [disabled]="mentorCurrentPage === totalMentorPages" class="px-3 py-1 border border-border-color rounded-md disabled:opacity-50">&gt;</button>
-        </nav>
+          <button (click)="nextMentorPage()" [disabled]="mentorCurrentPage === totalMentorPages" class="pagination-button">&gt;</button>
+        </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-          <div *ngFor="let mentor of paginatedMentors" class="bg-white rounded-lg shadow-lg p-4 text-center transform transition-transform duration-300 hover:scale-105">
-              <img [src]="mentor.image" alt="{{ mentor.name }}" class="w-24 h-24 rounded-full mx-auto mb-4">
-              <h4 class="font-bold text-dark">{{ mentor.name }}</h4>
-              <p class="text-sm text-dark-gray">{{ mentor.title }}</p>
+          <div *ngFor="let mentor of paginatedMentors" class="instructor-card">
+              <div class="instructor-avatar">
+                {{ getInstructorName(mentor).charAt(0) }}
+              </div>
+              <h4 class="font-bold text-gray-800">{{ getInstructorName(mentor) }}</h4>
+              <p class="text-sm text-gray-600">Instructor</p>
               <div class="flex items-center justify-center mt-2">
                   <span class="text-yellow-500">★</span>
-                  <span class="text-dark-gray ml-1">{{ mentor.rating }}</span>
-                  <span class="text-dark-gray ml-2">({{ mentor.students }} Students)</span>
+                  <span class="text-gray-600 ml-1">{{ getInstructorRating(mentor) | number:'1.1-1' }}</span>
+                  <span class="text-gray-500 ml-2">({{ formatStudentCount(getInstructorStudentCount(mentor)) }} Students)</span>
               </div>
           </div>
       </div>
@@ -147,22 +218,27 @@
 
     <!-- Featured Courses -->
     <div class="mt-16">
-        <h2 class="text-3xl font-bold text-primary mb-6">Featured Courses</h2>
+        <div class="section-header">
+            <h2 class="section-title">Featured Courses</h2>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div *ngFor="let course of featuredCourses" class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105">
-                <img [src]="course.image" alt="{{ course.title }}" class="w-full h-48 object-cover rounded-t-lg">
-                <div class="p-4">
-                  <h3 class="font-bold text-lg mb-2 text-dark">{{ course.title }}</h3>
-                  <p class="text-sm text-dark-gray mb-2">{{ course.author }}</p>
-                  <div class="flex items-center text-sm text-dark-gray mb-2">
-                    <span class="font-bold text-dark mr-1">{{ course.rating }}</span>
+            <div *ngFor="let course of featuredCourses" class="course-card">
+                <img [src]="course.imageUrl || '/assets/images/course-image2.jpg'" alt="{{ course.title }}" class="w-full h-48 object-cover">
+                <div class="p-6">
+                  <h3 class="font-bold text-lg mb-2 text-gray-800">{{ course.title }}</h3>
+                  <p class="text-sm text-gray-600 mb-2">{{ getInstructorName(course.instructor) }}</p>
+                  <p class="text-xs text-gray-500 mb-2">{{ course.category.name }} • {{ course.difficulty }}</p>
+                  <div class="flex items-center text-sm text-gray-600 mb-2">
+                    <span class="font-bold text-gray-800 mr-1">{{ getCourseRating(course) | number:'1.1-1' }}</span>
                     <div class="flex items-center">
-                      <svg *ngFor="let i of [1,2,3,4]" class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                      <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                      <ng-container *ngFor="let i of [1,2,3,4,5]">
+                        <svg *ngIf="i <= Math.round(getCourseRating(course))" class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <svg *ngIf="i > Math.round(getCourseRating(course))" class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                      </ng-container>
                     </div>
-                    <span class="ml-1">({{ course.reviews }})</span>
+                    <span class="ml-1">({{ course.totalReviews || 0 }})</span>
                   </div>
-                  <p class="text-lg font-bold text-dark">${{ course.price }}</p>
+                  <p class="text-lg font-bold text-gray-800">KSH {{ course.price }}</p>
                 </div>
             </div>
         </div>
