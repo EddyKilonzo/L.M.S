@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { SharedNavbar } from '../shared/navbar/navbar.component';
+import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { AuthService, User } from '../services/auth.service';
 import { CoursesService } from '../services/courses.service';
 import { CategoriesService } from '../services/categories.service';
-import { ToastService } from '../services/toast.service';
-import { AuthService } from '../services/auth.service';
 import { CloudinaryService } from '../services/cloudinary.service';
+import { ToastService } from '../services/toast.service';
+import { SharedNavbar } from '../shared/navbar/navbar.component';
 
 interface Module {
   id?: string;
@@ -37,7 +37,7 @@ export class CourseCreationComponent implements OnInit {
   courseForm: FormGroup;
   categories: any[] = [];
   isLoading = false;
-  user: any = null;
+  user: User | null = null;
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   fileError: string | null = null;

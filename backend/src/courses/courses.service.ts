@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto';
 import {
@@ -72,8 +68,6 @@ export class CoursesService {
             email: true,
             role: true,
             isVerified: true,
-            about: true,
-            profileImage: true,
             createdAt: true,
           },
         },
@@ -141,8 +135,6 @@ export class CoursesService {
               firstName: true,
               lastName: true,
               email: true,
-              about: true,
-              profileImage: true,
             },
           },
           category: true,
@@ -157,25 +149,8 @@ export class CoursesService {
       this.prisma.course.count({ where }),
     ]);
 
-    // Get average ratings for all courses
-    const coursesWithRatings = await Promise.all(
-      courses.map(async (course) => {
-        const ratingData = await this.prisma.courseReview.aggregate({
-          where: { courseId: course.id },
-          _avg: { rating: true },
-          _count: { rating: true },
-        });
-
-        return {
-          ...course,
-          averageRating: ratingData._avg.rating || 0,
-          totalReviews: ratingData._count.rating,
-        };
-      })
-    );
-
     return {
-      data: coursesWithRatings as unknown as CourseWithInstructorAndCategoryResponse[],
+      data: courses as unknown as CourseWithInstructorAndCategoryResponse[],
       total,
       page,
       limit,
@@ -195,8 +170,6 @@ export class CoursesService {
             firstName: true,
             lastName: true,
             email: true,
-            about: true,
-            profileImage: true,
           },
         },
         category: true,
@@ -246,8 +219,6 @@ export class CoursesService {
               firstName: true,
               lastName: true,
               email: true,
-              about: true,
-              profileImage: true,
             },
           },
           category: true,
@@ -274,7 +245,7 @@ export class CoursesService {
   async getPopularCourses(
     limit = 6,
   ): Promise<CourseWithInstructorAndCategoryResponse[]> {
-    const courses = await this.prisma.course.findMany({
+    return (await this.prisma.course.findMany({
       take: limit,
       orderBy: {
         enrollments: {
@@ -298,26 +269,7 @@ export class CoursesService {
           },
         },
       },
-    });
-
-    // Get average ratings for all courses
-    const coursesWithRatings = await Promise.all(
-      courses.map(async (course) => {
-        const ratingData = await this.prisma.courseReview.aggregate({
-          where: { courseId: course.id },
-          _avg: { rating: true },
-          _count: { rating: true },
-        });
-
-        return {
-          ...course,
-          averageRating: ratingData._avg.rating || 0,
-          totalReviews: ratingData._count.rating,
-        };
-      })
-    );
-
-    return coursesWithRatings as unknown as CourseWithInstructorAndCategoryResponse[];
+    })) as unknown as CourseWithInstructorAndCategoryResponse[];
   }
 
   async update(
@@ -494,28 +446,5 @@ export class CoursesService {
         },
       },
     })) as unknown as CourseWithInstructorAndCategoryResponse[];
-  }
-
-  async getCourseCounts(id: string): Promise<{ enrollments: number; reviews: number }> {
-    const course = await this.prisma.course.findUnique({
-      where: { id },
-      select: {
-        _count: {
-          select: {
-            enrollments: true,
-            reviews: true,
-          },
-        },
-      },
-    });
-
-    if (!course) {
-      throw new NotFoundException('Course not found');
-    }
-
-    return {
-      enrollments: course._count.enrollments,
-      reviews: course._count.reviews,
-    };
   }
 }

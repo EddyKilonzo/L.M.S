@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { User } from './auth.service';
 
-interface Instructor {
+export interface Instructor {
   id: string;
   firstName: string;
   lastName: string;
@@ -21,6 +22,22 @@ interface Instructor {
   };
 }
 
+export interface UpdateUserRequest {
+  firstName?: string;
+  lastName?: string;
+  about?: string;
+  profileImage?: string;
+}
+
+export interface UpdateUserResponse {
+  message: string;
+  user: User;
+}
+
+export interface DeleteUserResponse {
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -29,8 +46,8 @@ export class UsersService {
 
   constructor(private http: HttpClient) {}
 
-  getUsers(): Observable<any> {
-    return this.http.get(this.apiUrl).pipe(catchError(this.handleError));
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiUrl).pipe(catchError(this.handleError));
   }
 
   getInstructors(): Observable<Instructor[]> {
@@ -39,61 +56,66 @@ export class UsersService {
       .pipe(catchError(this.handleError));
   }
 
-  getUser(id: string): Observable<any> {
+  getUser(id: string): Observable<User> {
     return this.http
-      .get(`${this.apiUrl}/${id}`)
+      .get<User>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
-  updateUser(id: string, userData: any): Observable<any> {
+  updateUser(id: string, userData: UpdateUserRequest): Observable<UpdateUserResponse> {
     return this.http
-      .patch(`${this.apiUrl}/${id}`, userData)
+      .patch<UpdateUserResponse>(`${this.apiUrl}/${id}`, userData)
       .pipe(catchError(this.handleError));
   }
 
-  deleteUser(id: string): Observable<any> {
+  deleteUser(id: string): Observable<DeleteUserResponse> {
     return this.http
-      .delete(`${this.apiUrl}/${id}`)
+      .delete<DeleteUserResponse>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
-  private handleError(error: any) {
+  private handleError(error: Error | unknown) {
     console.error('An error occurred', error);
 
-    if (error.status === 0) {
-      return throwError(
-        () =>
-          new Error(
-            'Unable to connect to server. Please check your internet connection.'
-          )
-      );
-    }
+    // Handle HTTP errors
+    if (error && typeof error === 'object' && 'status' in error) {
+      const httpError = error as { status: number; message?: string };
 
-    if (error.status === 401) {
-      return throwError(
-        () => new Error('Please log in to access this resource.')
-      );
-    }
+      if (httpError.status === 0) {
+        return throwError(
+          () =>
+            new Error(
+              'Unable to connect to server. Please check your internet connection.'
+            )
+        );
+      }
 
-    if (error.status === 403) {
-      return throwError(
-        () =>
-          new Error(
-            'Access denied. You do not have permission to perform this action.'
-          )
-      );
-    }
+      if (httpError.status === 401) {
+        return throwError(
+          () => new Error('Please log in to access this resource.')
+        );
+      }
 
-    if (error.status === 404) {
-      return throwError(
-        () => new Error('User not found. Please check the URL and try again.')
-      );
-    }
+      if (httpError.status === 403) {
+        return throwError(
+          () =>
+            new Error(
+              'Access denied. You do not have permission to perform this action.'
+            )
+        );
+      }
 
-    if (error.status >= 500) {
-      return throwError(
-        () => new Error('Server error. Please try again later.')
-      );
+      if (httpError.status === 404) {
+        return throwError(
+          () => new Error('User not found. Please check the URL and try again.')
+        );
+      }
+
+      if (httpError.status >= 500) {
+        return throwError(
+          () => new Error('Server error. Please try again later.')
+        );
+      }
     }
 
     return throwError(() => error);

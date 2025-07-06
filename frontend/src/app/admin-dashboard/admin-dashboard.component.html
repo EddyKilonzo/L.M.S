@@ -1,0 +1,302 @@
+<div class="admin-dashboard-container">
+  <!-- Admin Navbar -->
+  <app-shared-navbar></app-shared-navbar>
+  
+  <div class="dashboard-content">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+    <div class="sidebar-header">
+      <a class="sidebar-home-link" routerLink="/">
+        <span class="home-icon">
+          <!-- Home icon SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 2v6a2 2 0 002 2h4a2 2 0 002-2v-6m-5 0h6" /></svg>
+        </span>
+        <span>Home</span>
+      </a>
+      <span class="logo">L.M.S</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-tab" 
+              [class.active]="activeTab === 'dashboard'"
+              (click)="setActiveTab('dashboard')">
+        <span class="nav-icon">
+          <!-- Heroicon: Home -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 2v6a2 2 0 002 2h4a2 2 0 002-2v-6m-5 0h6" /></svg>
+        </span> Dashboard
+      </button>
+      <button class="nav-tab" 
+              [class.active]="activeTab === 'courses'"
+              (click)="setActiveTab('courses')">
+        <span class="nav-icon">
+          <!-- Heroicon: Book Open -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M12 4h9m-9 8h9m-9 8H3m9-8H3m9-8H3" /></svg>
+        </span> Courses
+      </button>
+      <button class="nav-tab" 
+              [class.active]="activeTab === 'communication'"
+              (click)="setActiveTab('communication')">
+        <span class="nav-icon">
+          <!-- Heroicon: Chat Bubble Left Right -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 3.866-3.582 7-8 7a8.96 8.96 0 01-4.688-1.32L3 21l1.32-4.688A8.96 8.96 0 013 12c0-3.866 3.582-7 8-7s8 3.134 8 7z" /></svg>
+        </span> Communication
+      </button>
+      <button class="nav-tab" 
+              [class.active]="activeTab === 'revenue'"
+              (click)="setActiveTab('revenue')">
+        <span class="nav-icon">
+          <!-- Heroicon: Currency Dollar -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.343-4 3s1.79 3 4 3 4-1.343 4-3-1.79-3-4-3zm0 0V4m0 8v8" /></svg>
+        </span> Revenue
+      </button>
+      <button class="nav-tab" 
+              [class.active]="activeTab === 'settings'"
+              (click)="setActiveTab('settings')">
+        <span class="nav-icon">
+          <!-- Heroicon: Cog -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0a1.724 1.724 0 002.573.965c.797-.46 1.8.149 1.8 1.047v2.02a1.724 1.724 0 001.285 1.67c.902.3.902 1.603 0 1.902a1.724 1.724 0 00-1.285 1.67v2.02c0 .898-1.003 1.507-1.8 1.047a1.724 1.724 0 00-2.573.965c-.3.921-1.603.921-1.902 0a1.724 1.724 0 00-2.573-.965c-.797.46-1.8-.149-1.8-1.047v-2.02a1.724 1.724 0 00-1.285-1.67c-.902-.3-.902-1.603 0-1.902A1.724 1.724 0 005.05 7.979v-2.02c0-.898 1.003-1.507 1.8-1.047a1.724 1.724 0 002.573-.965z" /></svg>
+        </span> Settings
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-profile" *ngIf="adminUser">
+        <span class="user-avatar">
+          {{ (adminUser.firstName ? adminUser.firstName.charAt(0) : '') + (adminUser.lastName ? adminUser.lastName.charAt(0) : '') | uppercase }}
+        </span>
+        <span class="user-name">
+          {{ adminUser.firstName && adminUser.lastName ? (adminUser.firstName + ' ' + adminUser.lastName) : adminUser.email }}
+        </span>
+        <span class="user-role">{{ adminUser.role | titlecase }}</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Dashboard Content -->
+  <main class="dashboard-main">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading dashboard data...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-container">
+      <div class="error-message">{{ error }}</div>
+      <button class="retry-btn" (click)="ngOnInit()">Retry</button>
+    </div>
+
+    <!-- Tab Content -->
+    <ng-container *ngIf="!loading && !error">
+      <!-- Dashboard Tab -->
+      <div *ngIf="activeTab === 'dashboard'" class="tab-content">
+        <div class="dashboard-top-grid">
+          <div class="dashboard-summary-col">
+            <div class="summary-cards">
+              <div class="summary-card">
+                <div class="summary-icon commission">
+                  <!-- Heroicon: Trending Up -->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7" style="color:#2563eb"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17l6-6 4 4 8-8" /></svg>
+                </div>
+                <div>
+                  <div class="summary-value">{{ formatCurrency(dashboardStats?.totalRevenue || 0) }}</div>
+                  <div class="summary-label">Total Revenue</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-icon received">
+                  <!-- Heroicon: Users -->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7" style="color:#22c55e"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" /></svg>
+                </div>
+                <div>
+                  <div class="summary-value">{{ dashboardStats?.totalUsers || 0 }}</div>
+                  <div class="summary-label">Total Users</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-icon pending">
+                  <!-- Heroicon: Book Open -->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7" style="color:#f59e42"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <div>
+                  <div class="summary-value">{{ dashboardStats?.totalCourses || 0 }}</div>
+                  <div class="summary-label">Total Courses</div>
+                </div>
+              </div>
+              <div class="summary-card">
+                <div class="summary-icon enrollments">
+                  <!-- Heroicon: Academic Cap -->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-7 h-7" style="color:#8b5cf6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>
+                </div>
+                <div>
+                  <div class="summary-value">{{ dashboardStats?.totalEnrollments || 0 }}</div>
+                  <div class="summary-label">Total Enrollments</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-chart-col">
+            <div class="sales-chart-card">
+              <div class="sales-chart-header">Monthly Revenue</div>
+              <div class="chart-container">
+                <ngx-charts-area-chart
+                  [view]="salesChartView"
+                  [scheme]="salesChartColorScheme"
+                  [results]="salesChartData"
+                  [gradient]="true"
+                  [xAxis]="true"
+                  [yAxis]="true"
+                  [legend]="true"
+                  [showXAxisLabel]="false"
+                  [showYAxisLabel]="false"
+                  [autoScale]="true"
+                  [timeline]="false"
+                  [animations]="true">
+                </ngx-charts-area-chart>
+              </div>
+            </div>
+          </div>
+          <button class="add-course-btn">Add Course</button>
+        </div>
+
+        <div class="dashboard-section">
+          <div class="dashboard-section-title">Reviews</div>
+          <div class="reviews-row">
+            <div class="review-card total">
+              <div class="review-label">Total Reviews</div>
+              <div class="review-value">{{ reviewsSummary.totalReviews }}</div>
+            </div>
+            <div class="review-card" *ngFor="let star of [1,2,3,4,5]">
+              <div class="review-label">{{ star }} star reviews</div>
+              <div class="review-value">{{ getReviewCount(star) }}
+                <span class="star-badge" [ngClass]="'star-' + star">{{ star }}.0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Courses Tab -->
+      <div *ngIf="activeTab === 'courses'" class="tab-content">
+        <div class="tab-header">
+          <h2>Courses</h2>
+          <button class="add-course-btn">Add Course</button>
+        </div>
+        <div class="courses-filter-row">
+          <select class="courses-filter-select" [(ngModel)]="selectedCategory">
+            <option value="">All Categories</option>
+            <option *ngFor="let cat of categories || []" [value]="cat.id">{{ cat.name }}</option>
+          </select>
+          <input type="text" class="courses-filter-input" placeholder="Search courses..." [(ngModel)]="courseFilter" />
+        </div>
+        <div class="courses-grid">
+          <ng-container *ngIf="filteredCourses() && filteredCourses().length > 0; else noCourses">
+            <div class="course-card" *ngFor="let course of filteredCourses()" (click)="selectCourse(course)" [title]="'Click to view details: ' + course.title">
+              <div class="course-card-header" style="flex-direction: row; align-items: center;">
+                <img [src]="course.imageUrl || 'https://via.placeholder.com/40x40?text=Course'" class="course-card-img-side" alt="Course image" />
+                <div style="display: flex; flex-direction: column; margin-left: 0.5rem;">
+                  <span class="course-badge">{{ course.category.name || 'Uncategorized' }}</span>
+                  <span class="course-card-title">{{ course.title }}</span>
+                </div>
+              </div>
+              <hr />
+              <div class="course-card-row">
+                <div class="course-card-stat">
+                  <div class="stat-value">KSH{{ (course.price || 0).toFixed(2) }}</div>
+                  <div class="stat-label">Price</div>
+                </div>
+                <div class="course-card-stat">
+                  <div class="stat-value">{{ (course.modules || []).length }}</div>
+                  <div class="stat-label">Modules</div>
+                </div>
+                <div class="course-card-stat">
+                  <div class="stat-value">{{ (course._count || {}).enrollments || 0 }}</div>
+                  <div class="stat-label">Orders</div>
+                </div>
+              </div>
+              <div class="course-card-row">
+                <div class="course-card-stat">
+                  <div class="stat-value">-</div>
+                  <div class="stat-label">Certificates</div>
+                </div>
+                <div class="course-card-stat">
+                  <div class="stat-value">{{ (course._count || {}).reviews || 0 }}</div>
+                  <div class="stat-label">Reviews</div>
+                </div>
+                <div class="course-card-stat">
+                  <div class="stat-value">-</div>
+                  <div class="stat-label">Added to Shelf</div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #noCourses>
+            <div class="no-courses-fallback">No courses found for the selected filter.</div>
+          </ng-template>
+        </div>
+        <!-- Course Details Panel -->
+        <div class="course-details-overlay" *ngIf="selectedCourse" (click)="closeCourseDetails()"></div>
+        <div class="course-details-panel" *ngIf="selectedCourse" (click)="$event.stopPropagation()">
+          <button class="close-details-btn" (click)="closeCourseDetails()">&times;</button>
+          <div *ngIf="isCourseDetailsLoading" class="details-loading">Loading...</div>
+          <div *ngIf="!isCourseDetailsLoading && selectedCourse">
+            <h3>{{ selectedCourse.title || 'Course Details' }}</h3>
+            <img *ngIf="selectedCourse.imageUrl" [src]="selectedCourse.imageUrl" class="details-img" alt="Course image" />
+            <p *ngIf="selectedCourse.category"><b>Category:</b> {{ selectedCourse.category.name }}</p>
+            <p><b>Price:</b> KSH{{ (selectedCourse.price || 0).toFixed(2) }}</p>
+            <p *ngIf="selectedCourse.description"><b>Description:</b> {{ selectedCourse.description }}</p>
+            <p><b>Modules:</b> {{ (selectedCourse.modules || []).length }}</p>
+            <p><b>Enrollments:</b> {{ (selectedCourse._count || {}).enrollments || 0 }}</p>
+            <p><b>Reviews:</b> {{ (selectedCourse._count || {}).reviews || 0 }}</p>
+            <p *ngIf="selectedCourse.instructor"><b>Instructor:</b> {{ selectedCourse.instructor.firstName }} {{ selectedCourse.instructor.lastName }}</p>
+            <p *ngIf="selectedCourse.createdAt"><b>Created:</b> {{ selectedCourse.createdAt | date:'medium' }}</p>
+          </div>
+          <div *ngIf="!isCourseDetailsLoading && !selectedCourse">
+            <div class="details-error">Failed to load course details.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Communication Tab -->
+      <div *ngIf="activeTab === 'communication'" class="tab-content">
+        <div class="tab-header">
+          <h2>Communication Center</h2>
+        </div>
+        <div class="communication-content">
+          <p>Communication features coming soon...</p>
+        </div>
+      </div>
+
+      <!-- Revenue Tab -->
+      <div *ngIf="activeTab === 'revenue'" class="tab-content">
+        <div class="tab-header">
+          <h2>Revenue Analytics</h2>
+        </div>
+        <div class="revenue-content">
+          <div class="revenue-summary">
+            <h3>Revenue Overview</h3>
+            <div class="revenue-stats">
+              <div class="revenue-stat">
+                <span class="stat-label">Total Revenue</span>
+                <span class="stat-value">{{ formatCurrency(dashboardStats?.totalRevenue || 0) }}</span>
+              </div>
+              <div class="revenue-stat">
+                <span class="stat-label">This Month</span>
+                <span class="stat-value">{{ formatCurrency(dashboardStats?.totalRevenue || 0) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div *ngIf="activeTab === 'settings'" class="tab-content">
+        <div class="tab-header">
+          <h2>System Settings</h2>
+        </div>
+        <div class="settings-content">
+          <p>Settings panel coming soon...</p>
+        </div>
+      </div>
+    </ng-container>
+  </main>
+  </div>
+</div>

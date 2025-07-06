@@ -37,7 +37,7 @@
             </button>
           </div>
           <div class="text-lg font-semibold text-gray-800 ml-4">${{ course.price }}</div>
-          <button class="ml-4 bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800" (click)="proceedToCheckout(course)">Proceed to Checkout</button>
+          <button class="ml-4 bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800" (click)="proceedToCheckout(course)" *ngIf="!isAdmin">Proceed to Checkout</button>
         </div>
       </div>
       <!-- Order Summary -->
@@ -60,7 +60,7 @@
           <span>Total</span>
           <span>${{ getFinalTotal() }}</span>
         </div>
-        <button class="w-full bg-blue-700 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 transition" [disabled]="cart.length === 0" (click)="checkoutAllCourses()">
+        <button class="w-full bg-blue-700 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 transition" [disabled]="cart.length === 0" (click)="checkoutAllCourses()" *ngIf="!isAdmin">
           Checkout All Courses
         </button>
       </div>

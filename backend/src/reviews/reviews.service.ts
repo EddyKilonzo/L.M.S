@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto';
 
@@ -29,7 +34,10 @@ export interface CourseReviewsResponse {
 export class ReviewsService {
   constructor(private prisma: PrismaService) {}
 
-  async createReview(createReviewDto: CreateReviewDto, studentId: string): Promise<ReviewResponse> {
+  async createReview(
+    createReviewDto: CreateReviewDto,
+    studentId: string,
+  ): Promise<ReviewResponse> {
     // Check if user is enrolled in the course
     const enrollment = await this.prisma.courseEnrollment.findFirst({
       where: {
@@ -39,7 +47,9 @@ export class ReviewsService {
     });
 
     if (!enrollment) {
-      throw new ForbiddenException('You must be enrolled in this course to review it');
+      throw new ForbiddenException(
+        'You must be enrolled in this course to review it',
+      );
     }
 
     // Check if user already reviewed this course
@@ -173,7 +183,11 @@ export class ReviewsService {
     return review as ReviewResponse;
   }
 
-  async updateReview(id: string, updateReviewDto: UpdateReviewDto, studentId: string): Promise<ReviewResponse> {
+  async updateReview(
+    id: string,
+    updateReviewDto: UpdateReviewDto,
+    studentId: string,
+  ): Promise<ReviewResponse> {
     const review = await this.prisma.courseReview.findUnique({
       where: { id },
     });
@@ -189,8 +203,12 @@ export class ReviewsService {
     const updatedReview = await this.prisma.courseReview.update({
       where: { id },
       data: {
-        ...(updateReviewDto.rating !== undefined && { rating: updateReviewDto.rating }),
-        ...(updateReviewDto.comment !== undefined && { comment: updateReviewDto.comment }),
+        ...(updateReviewDto.rating !== undefined && {
+          rating: updateReviewDto.rating,
+        }),
+        ...(updateReviewDto.comment !== undefined && {
+          comment: updateReviewDto.comment,
+        }),
       },
       include: {
         student: {
@@ -231,7 +249,9 @@ export class ReviewsService {
     });
   }
 
-  async getCourseAverageRating(courseId: string): Promise<{ averageRating: number; totalReviews: number }> {
+  async getCourseAverageRating(
+    courseId: string,
+  ): Promise<{ averageRating: number; totalReviews: number }> {
     const [averageRating, totalReviews] = await Promise.all([
       this.prisma.courseReview.aggregate({
         where: { courseId },
@@ -247,4 +267,4 @@ export class ReviewsService {
       totalReviews,
     };
   }
-} 
+}

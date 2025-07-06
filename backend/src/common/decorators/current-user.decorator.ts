@@ -8,7 +8,10 @@ interface RequestWithUser {
 export const CurrentUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): UserResponse => {
     const request = ctx.switchToHttp().getRequest<RequestWithUser>();
-    console.log('CurrentUser decorator - request object keys:', Object.keys(request));
+    console.log(
+      'CurrentUser decorator - request object keys:',
+      Object.keys(request),
+    );
     console.log('CurrentUser decorator - request.user:', request.user);
     return request.user;
   },

@@ -4,7 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../services/cart.service';
 import { CoursesService, Course } from '../services/courses.service';
-import { AuthService } from '../services/auth.service';
+import { AuthService, User } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 import { SharedNavbar } from '../shared/navbar/navbar.component';
 import { EnrollmentsService } from '../services/enrollments.service';
@@ -22,7 +22,7 @@ export class CheckoutComponent implements OnInit {
   loading = true;
   error: string | null = null;
   isSingleCourse = false;
-  user: any = null;
+  user: User | null = null;
 
   // Payment method selection
   selectedPayment: 'card' | 'paypal' | 'mpesa' = 'card';
@@ -53,6 +53,14 @@ export class CheckoutComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Check if user is admin and redirect if so
+    this.user = this.authService.currentUser;
+    if (this.user?.role === 'ADMIN') {
+      this.toastService.show('Admin users cannot access checkout functionality', 'error');
+      this.router.navigate(['/admin-dashboard']);
+      return;
+    }
+
     this.route.queryParams.subscribe(params => {
       const courseId = params['courseId'];
       const singleCourse = params['singleCourse'];
@@ -70,11 +78,6 @@ export class CheckoutComponent implements OnInit {
         this.error = 'Invalid checkout parameters';
         this.loading = false;
       }
-    });
-
-    // Get current user
-    this.authService.currentUser$.subscribe(user => {
-      this.user = user;
     });
   }
 
@@ -104,6 +107,10 @@ export class CheckoutComponent implements OnInit {
     return this.getTotal() - this.getDiscount();
   }
 
+  get isAdmin(): boolean {
+    return this.user?.role === 'ADMIN';
+  }
+
   applyCoupon() {
     // Simple coupon logic - you can expand this
     if (this.couponCode.toLowerCase() === 'welcome10') {
@@ -119,6 +126,13 @@ export class CheckoutComponent implements OnInit {
     if (!this.user) {
       this.toastService.show('Please login to proceed with payment', 'error');
       this.router.navigate(['/login']);
+      return;
+    }
+
+    // Check if user is admin
+    if (this.user.role === 'ADMIN') {
+      this.toastService.show('Admin users cannot proceed with payment', 'error');
+      this.router.navigate(['/admin-dashboard']);
       return;
     }
 
@@ -152,7 +166,7 @@ export class CheckoutComponent implements OnInit {
           this.toastService.show('Payment successful! You are now enrolled.', 'success');
           this.router.navigate(['/course', this.course!.id]);
         },
-        error: (err) => {
+        error: (err: any) => {
           if (err.status === 409) {
             this.toastService.show('You are already enrolled in this course.', 'info');
           } else {
@@ -166,5 +180,9 @@ export class CheckoutComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/cart']);
+  }
+
+  goToDashboard() {
+    this.router.navigate(['/admin-dashboard']);
   }
 } 

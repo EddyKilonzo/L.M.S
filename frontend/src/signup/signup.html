@@ -49,6 +49,22 @@
                     <span class="font-medium text-sm text-gray-700">Instructor</span>
                   </div>
                 </label>
+                <label class="cursor-pointer group">
+                  <input type="radio" name="role" value="ADMIN" [(ngModel)]="model.role" class="sr-only" />
+                  <div class="flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-all duration-300 group-hover:shadow-sm"
+                       [class.border-red-500]="model.role === 'ADMIN'"
+                       [class.bg-red-50]="model.role === 'ADMIN'"
+                       [class.border-gray-200]="model.role !== 'ADMIN'"
+                       [class.group-hover:border-red-300]="model.role !== 'ADMIN'">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span class="font-medium text-sm text-red-700">Admin</span>
+                  </div>
+                </label>
+              </div>
+              <div *ngIf="model.role === 'ADMIN'" class="mt-2 text-xs text-red-600 font-semibold">
+                Warning: This is for system administrators only. Do not use unless you have permission.
               </div>
             </div>
 

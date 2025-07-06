@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Course } from './courses.service';
 
 @Injectable({ providedIn: 'root' })
@@ -7,6 +8,7 @@ export class CartService {
   private storageKey = 'lms_cart';
   private cartSubject = new BehaviorSubject<Course[]>([]);
   public cart$ = this.cartSubject.asObservable();
+  public cartCount$ = this.cart$.pipe(map(cart => cart.length));
 
   constructor() {
     this.loadCartFromStorage();

@@ -100,4 +100,34 @@ export class AnalyticsController {
   ) {
     return await this.analyticsService.getStudentProgress(studentId, user);
   }
+
+  @Get('revenue-over-time')
+  @ApiOperation({
+    summary:
+      'Get revenue data over time (Admin: all revenue, Instructor: own course revenue)',
+  })
+  @ApiResponse({ status: 200, description: 'Revenue data over time' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin/Instructor access required',
+  })
+  @Roles('ADMIN', 'INSTRUCTOR')
+  async getRevenueOverTime(@CurrentUser() user: UserResponse) {
+    return await this.analyticsService.getRevenueOverTime(user);
+  }
+
+  @Get('reviews-summary')
+  @ApiOperation({
+    summary:
+      'Get reviews summary (Admin: all reviews, Instructor: reviews for their courses)',
+  })
+  @ApiResponse({ status: 200, description: 'Reviews summary' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin/Instructor access required',
+  })
+  @Roles('ADMIN', 'INSTRUCTOR')
+  async getReviewsSummary(@CurrentUser() user: UserResponse) {
+    return await this.analyticsService.getReviewsSummary(user);
+  }
 }

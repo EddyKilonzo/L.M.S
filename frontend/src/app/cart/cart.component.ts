@@ -5,6 +5,7 @@ import { CartService } from '../services/cart.service';
 import { Course } from '../services/courses.service';
 import { ToastService } from '../services/toast.service';
 import { SharedNavbar } from '../shared/navbar/navbar.component';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-cart',
@@ -20,7 +21,8 @@ export class CartComponent implements OnInit {
   constructor(
     private cartService: CartService, 
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +55,10 @@ export class CartComponent implements OnInit {
     return this.getTotal() - this.getDiscount();
   }
 
+  get isAdmin(): boolean {
+    return this.authService.currentUser?.role === 'ADMIN';
+  }
+
   proceedToCheckout(course: Course) {
     // For single course checkout, we'll navigate to a checkout page
     // You can implement this based on your checkout flow
@@ -74,7 +80,7 @@ export class CartComponent implements OnInit {
   }
 
   goToCourses() {
-    this.router.navigate(['/categories']);
+    this.router.navigate(['/courses']);
   }
 
   clearCart() {

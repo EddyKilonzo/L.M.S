@@ -266,13 +266,4 @@ export class CoursesController {
     const limitNum = limit ? parseInt(limit) : 4;
     return await this.coursesService.findRelated(id, limitNum);
   }
-
-  @Get(':id/counts')
-  @ApiOperation({ summary: 'Get course counts (enrollments and reviews)' })
-  @ApiParam({ name: 'id', description: 'Course ID' })
-  @ApiResponse({ status: 200, description: 'Course counts found' })
-  @ApiResponse({ status: 404, description: 'Course not found' })
-  async getCourseCounts(@Param('id') id: string) {
-    return await this.coursesService.getCourseCounts(id);
-  }
 }

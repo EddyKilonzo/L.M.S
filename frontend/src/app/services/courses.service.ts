@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpParams,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -43,8 +47,6 @@ export interface Course {
     reviews: number;
     enrollments: number;
   };
-  averageRating?: number;
-  totalReviews?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -80,9 +82,9 @@ export class CoursesService {
 
   constructor(private http: HttpClient) {}
 
-  getCourses(params: HttpParams = new HttpParams()): Observable<Course[]> {
+  getCourses(params: HttpParams = new HttpParams()): Observable<{ data: Course[] }> {
     return this.http
-      .get<Course[]>(this.apiUrl, { params })
+      .get<{ data: Course[] }>(this.apiUrl, { params })
       .pipe(catchError(this.handleError));
   }
 
@@ -131,13 +133,8 @@ export class CoursesService {
       .pipe(catchError(this.handleError));
   }
 
-  /**
-   * Fetches the enrollments and reviews count for a course by ID.
-   * Assumes backend endpoint GET /api/courses/:id/counts returns { enrollments, reviews }
-   */
-  getCourseCounts(courseId: string): Observable<{ enrollments: number; reviews: number }> {
-    return this.http.get<{ enrollments: number; reviews: number }>(`${this.apiUrl}/${courseId}/counts`)
-      .pipe(catchError(this.handleError));
+  getCategories(): Observable<{ id: string; name: string }[]> {
+    return this.http.get<{ id: string; name: string }[]>(`${this.apiUrl}/categories`).pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {

@@ -4,16 +4,17 @@
 @authUrl = {{baseUrl}}/auth
 
 ### 1. Register a new user
-POST {{authUrl}}/register
+POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "email": "testuser@example.com",
-  "password": "password123",
-  "firstName": "Test",
-  "lastName": "User",
-  "role": "STUDENT"
+  "email": "admin@example.com",
+  "password": "admin@example.com",
+  "firstName": "Admin",
+  "lastName": "Admin",
+  "role": "ADMIN"
 }
+
 
 ### 2. Register another user (instructor)
 POST {{authUrl}}/register
@@ -93,4 +94,4 @@ Content-Type: application/json
 }
 
 ### 10. Verify email with token (replace with actual token)
-GET {{authUrl}}/verify-email?token=your-verification-token-here 
+GET {{authUrl}}/verify-email?token=69857 

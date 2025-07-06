@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateReviewDto {
   @ApiProperty({
     description: 'The ID of the course being reviewed',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsString()
   @IsNotEmpty()
@@ -14,7 +14,7 @@ export class CreateReviewDto {
     description: 'The rating given to the course (1-5)',
     example: 5,
     minimum: 1,
-    maximum: 5
+    maximum: 5,
   })
   @IsInt()
   @Min(1)
@@ -23,9 +23,10 @@ export class CreateReviewDto {
 
   @ApiProperty({
     description: 'The review comment',
-    example: 'Excellent course! The content is well-structured and easy to follow.',
-    required: false
+    example:
+      'Excellent course! The content is well-structured and easy to follow.',
+    required: false,
   })
   @IsString()
   comment?: string;
-} 
+}

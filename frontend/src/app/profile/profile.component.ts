@@ -8,7 +8,7 @@ import {
   FormsModule,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService, User } from '../services/auth.service';
 import { SharedNavbar } from '../shared/navbar/navbar.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastService } from '../services/toast.service';
@@ -101,7 +101,7 @@ interface Conversation {
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
-  user: any = null;
+  user: User | null = null;
   imagePreview: string | ArrayBuffer | null = null;
   isLoading = false;
   hasUnreadMessages = true; // Add this property for message notifications
@@ -489,20 +489,11 @@ export class ProfileComponent implements OnInit {
 
   loadEnrolledCourses() {
     this.enrollmentsService.getMyEnrollments().subscribe({
-      next: (response: any) => {
-        const enrollments = response || [];
+      next: (enrollments: any[]) => {
         this.courses = enrollments.map((enrollment: any) => ({
           ...enrollment.course,
           enrollment: enrollment
         }));
-        // Fetch real _count for each course
-        for (const course of this.courses) {
-          this.coursesService.getCourseCounts(course.id).subscribe(counts => {
-            setTimeout(() => {
-              course._count = counts;
-            });
-          });
-        }
         // Extract unique instructors from enrolled courses
         const instructorsMap = new Map();
         for (const course of this.courses) {
@@ -722,14 +713,16 @@ export class ProfileComponent implements OnInit {
             next: (response) => {
               console.debug('Profile update response:', response);
               this.toastService.show('Profile updated successfully!', 'success');
-              this.authService.updateCurrentUser({
-                ...this.user,
-                firstName,
-                lastName,
-                about,
-                profileProgress,
-                profileImage: profileImageUrl,
-              });
+              if (this.user) {
+                this.authService.updateCurrentUser({
+                  ...this.user,
+                  firstName,
+                  lastName,
+                  about,
+                  profileProgress,
+                  profileImage: profileImageUrl,
+                });
+              }
               this.isLoading = false;
               this.selectedFile = null; // Clear the selected file after successful upload
             },
@@ -738,7 +731,7 @@ export class ProfileComponent implements OnInit {
                 status: error.status,
                 message: error.message,
                 error: error.error,
-                userId: this.user.id,
+                userId: this.user?.id,
               });
 
               if (error.status === 401) {
@@ -817,10 +810,12 @@ export class ProfileComponent implements OnInit {
         ).subscribe({
           next: (response) => {
             this.toastService.show('Profile image updated successfully!', 'success');
-            this.authService.updateCurrentUser({
-              ...this.user,
-              profileImage: uploadResult.url,
-            });
+            if (this.user) {
+              this.authService.updateCurrentUser({
+                ...this.user,
+                profileImage: uploadResult.url,
+              });
+            }
             this.imagePreview = uploadResult.url;
             this.selectedFile = null;
             this.isLoading = false;

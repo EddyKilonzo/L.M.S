@@ -10,7 +10,12 @@ import {
   Request,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -30,7 +35,10 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Create a new review' })
   @ApiResponse({ status: 201, description: 'Review created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 409, description: 'User already reviewed this course' })
+  @ApiResponse({
+    status: 409,
+    description: 'User already reviewed this course',
+  })
   @Roles('STUDENT')
   async createReview(
     @Body() createReviewDto: CreateReviewDto,
@@ -50,7 +58,10 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user reviews' })
-  @ApiResponse({ status: 200, description: 'User reviews retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'User reviews retrieved successfully',
+  })
   @Roles('STUDENT')
   async getMyReviews(@CurrentUser() user: UserResponse) {
     return await this.reviewsService.getUserReviews(user.id);
@@ -70,7 +81,10 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Update a review' })
   @ApiResponse({ status: 200, description: 'Review updated successfully' })
   @ApiResponse({ status: 404, description: 'Review not found' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Can only edit own reviews' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Can only edit own reviews',
+  })
   @Roles('STUDENT')
   async updateReview(
     @Param('id') id: string,
@@ -86,7 +100,10 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Delete a review' })
   @ApiResponse({ status: 200, description: 'Review deleted successfully' })
   @ApiResponse({ status: 404, description: 'Review not found' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Can only delete own reviews' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Can only delete own reviews',
+  })
   @Roles('STUDENT')
   async deleteReview(
     @Param('id') id: string,
@@ -97,8 +114,11 @@ export class ReviewsController {
 
   @Get('course/:courseId/average-rating')
   @ApiOperation({ summary: 'Get average rating for a course' })
-  @ApiResponse({ status: 200, description: 'Average rating retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Average rating retrieved successfully',
+  })
   async getCourseAverageRating(@Param('courseId') courseId: string) {
     return await this.reviewsService.getCourseAverageRating(courseId);
   }
-} 
+}

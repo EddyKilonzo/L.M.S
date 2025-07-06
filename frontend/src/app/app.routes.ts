@@ -11,6 +11,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { CourseCreationComponent } from './course-creation/course-creation.component';
 import { CartComponent } from './cart/cart.component';
 import { CheckoutComponent } from './checkout/checkout.component';
+import { adminAuthGuard, preventAdminGuard } from './services/admin-auth.guard';
 
 export const routes: Routes = [
   { path: '', component: LandingPage },
@@ -24,6 +25,11 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'course-creation', component: CourseCreationComponent },
   { path: 'course-creation/:id', component: CourseCreationComponent },
-  { path: 'cart', component: CartComponent },
-  { path: 'checkout', component: CheckoutComponent },
+  { path: 'cart', component: CartComponent, canActivate: [preventAdminGuard] },
+  { path: 'checkout', component: CheckoutComponent, canActivate: [preventAdminGuard] },
+  {
+    path: 'admin-dashboard',
+    canActivate: [adminAuthGuard],
+    loadComponent: () => import('./admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+  },
 ];

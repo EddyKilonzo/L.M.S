@@ -7,7 +7,7 @@ export class UpdateReviewDto {
     example: 5,
     minimum: 1,
     maximum: 5,
-    required: false
+    required: false,
   })
   @IsOptional()
   @IsInt()
@@ -17,10 +17,11 @@ export class UpdateReviewDto {
 
   @ApiProperty({
     description: 'The review comment',
-    example: 'Excellent course! The content is well-structured and easy to follow.',
-    required: false
+    example:
+      'Excellent course! The content is well-structured and easy to follow.',
+    required: false,
   })
   @IsOptional()
   @IsString()
   comment?: string;
-} 
+}

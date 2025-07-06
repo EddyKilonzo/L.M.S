@@ -4,7 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CoursesService } from '../services/courses.service';
 import { SharedNavbar } from '../shared/navbar/navbar.component';
-import { AuthService } from '../services/auth.service';
+import { AuthService, User } from '../services/auth.service';
 import { EnrollmentsService } from '../services/enrollments.service';
 import { ToastService } from '../services/toast.service';
 import { ProgressService } from '../services/progress.service';
@@ -38,7 +38,7 @@ export class CourseLearningComponent implements OnInit {
   course: any = null;
   loading = true;
   error: string | null = null;
-  user: any = null;
+  user: User | null = null;
   isEnrolled = false;
   currentLesson: any = null;
   activeTab: 'content' | 'progress' | 'notes' = 'content';
@@ -284,7 +284,7 @@ export class CourseLearningComponent implements OnInit {
         
         // Check if current user has already reviewed this course
         if (this.user?.id) {
-          this.userHasReviewed = this.reviews.some(review => review.student.id === this.user.id);
+          this.userHasReviewed = this.reviews.some(review => review.student.id === this.user?.id);
         }
       },
       error: (error) => {

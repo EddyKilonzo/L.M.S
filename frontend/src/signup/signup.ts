@@ -42,7 +42,7 @@ export class Signup {
         lastName,
         email,
         password,
-        role
+        role: role as 'STUDENT' | 'INSTRUCTOR'
       };
 
       this.authService

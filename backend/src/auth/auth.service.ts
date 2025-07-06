@@ -229,7 +229,7 @@ export class AuthService {
       },
     });
     console.log('AuthService.validateUser - user from database:', user);
-    
+
     if (!user) {
       console.log('AuthService.validateUser - user not found in database');
       return null;
@@ -247,8 +247,11 @@ export class AuthService {
       profileImage: user.profileImage,
       createdAt: user.createdAt,
     };
-    
-    console.log('AuthService.validateUser - returning user response:', userResponse);
+
+    console.log(
+      'AuthService.validateUser - returning user response:',
+      userResponse,
+    );
     return userResponse;
   }
 

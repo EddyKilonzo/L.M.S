@@ -2,504 +2,69 @@
 <div class="bg-secondary">
   <div class="container mx-auto p-4 md:p-8">
     <!-- Loading state -->
-    <div *ngIf="loading" class="loading-container">
-      <div class="loading-spinner"></div>
+    <div *ngIf="loading" class="flex items-center justify-center min-h-[400px]">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
 
     <!-- Error state -->
-    <div *ngIf="error" class="error-container">
-      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div *ngIf="error" class="flex flex-col items-center justify-center min-h-[400px] text-center">
+      <svg class="w-16 h-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>
-      <h2 class="error-title">{{ error }}</h2>
-      <button (click)="loadCourse(course?.id || '')" class="retry-button">
+      <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ error }}</h2>
+      <button (click)="loadCourse(course?.id || '')" class="text-blue-600 hover:text-blue-800">
         Try Again
       </button>
     </div>
 
     <!-- Course content -->
-    <div *ngIf="!loading && !error && course" class="course-grid">
+    <div *ngIf="!loading && !error && course" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Main Content -->
-      <div class="main-content">
-        <!-- Breadcrumbs -->
-        <nav class="breadcrumbs">
-          <span>Home</span> >
-          <span>{{ course.category.name || 'Categories' }}</span> >
-          <span>{{ course.title }}</span>
-        </nav>
-
-        <!-- Course Header -->
-        <h1 class="course-title">{{ course.title }}</h1>
-        <p class="course-description">{{ course.description }}</p>
-
-        <!-- Course Meta -->
-        <div class="course-meta">
-          <div class="rating-container">
-            <svg *ngFor="let i of [1,2,3,4,5]"
-                 class="star-icon"
-                 [class.star-filled]="i <= ((course._count.reviews || 0) > 0 ? 4 : 0)"
-                 [class.star-empty]="i > ((course._count.reviews || 0) > 0 ? 4 : 0)"
-                 fill="currentColor"
-                 viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-            </svg>
-          </div>
-          <span class="meta-item">{{ course._count.reviews }} reviews</span>
-          <span class="meta-item">{{ getTotalLessons() }} lessons</span>
-          <span class="meta-item">{{ getTotalModules() }} modules</span>
-          <span class="meta-item">{{ course.difficulty }}</span>
-        </div>
-
-        <!-- Instructor -->
-        <div class="instructor-info">
-          <ng-container *ngIf="course.instructor?.profileImage; else showInitials">
-            <img [src]="course.instructor.profileImage" [alt]="getInstructorName()" class="instructor-avatar">
-          </ng-container>
-          <ng-template #showInitials>
-            <div class="instructor-avatar instructor-initials">
-              {{ getInstructorInitials() }}
-            </div>
-          </ng-template>
-          <div class="instructor-details">
-            <p class="instructor-name">{{ getInstructorName() }}</p>
-            <p class="instructor-title">{{ course.instructor.about || 'Course Instructor' }}</p>
-          </div>
-        </div>
-
-        <!-- Additional Meta -->
-        <div class="additional-meta">
-          <span class="meta-item">Created: {{ course.createdAt | date }}</span>
-          <span class="meta-item">Last updated: {{ course.updatedAt | date }}</span>
-          <span *ngIf="course.category" class="meta-item">Category: {{ course.category.name }}</span>
-        </div>
-
-        <!-- Tabs -->
-        <div class="tabs-container">
-          <nav class="tabs-nav">
-            <button (click)="setActiveTab('description')" 
-                    class="tab-link" 
-                    [class.active]="activeTab === 'description'">
-              Description
-            </button>
-            <button (click)="setActiveTab('instructor')" 
-                    class="tab-link" 
-                    [class.active]="activeTab === 'instructor'">
-              Instructor
-            </button>
-            <button (click)="setActiveTab('syllabus')" 
-                    class="tab-link" 
-                    [class.active]="activeTab === 'syllabus'">
-              Syllabus
-            </button>
-            <button (click)="setActiveTab('reviews')" 
-                    class="tab-link" 
-                    [class.active]="activeTab === 'reviews'">
-              Reviews
-            </button>
-          </nav>
-        </div>
-
-        <!-- Course Description Section -->
-        <div *ngIf="activeTab === 'description'" class="content-section">
-          <h2 class="section-title">Course Description</h2>
-          <p class="section-text">{{ course.description }}</p>
-          <h3 class="subsection-title">Certification</h3>
-          <p class="section-text">At Byway, we understand the significance of formal recognition for your hard work and dedication. Upon successful completion of our courses, you will earn a prestigious certification that not only validates your expertise but also opens doors to new opportunities in your chosen field.</p>
-        </div>
-
-        <!-- Instructor Details -->
-        <div *ngIf="activeTab === 'instructor'" class="content-section">
-          <h2 class="section-title">Instructor</h2>
-          <div class="instructor-detailed">
-            <ng-container *ngIf="course.instructor?.profileImage; else showInstructorInitials">
-              <img [src]="getInstructorImage()"
-                   [alt]="getInstructorName()"
-                   class="instructor-avatar-large">
-            </ng-container>
-            <ng-template #showInstructorInitials>
-              <div class="instructor-avatar-large instructor-initials-large">
-                {{ getInstructorInitials() }}
-              </div>
-            </ng-template>
-            <div class="instructor-info-detailed">
-              <p class="instructor-name-large">{{ getInstructorName() }}</p>
-              <p class="instructor-title">Course Instructor</p>
-              <div class="instructor-stats">
-                <span class="stat-item">★ 4.5 Instructor Rating</span>
-                <span class="stat-item">{{ course._count.reviews || 0 }} Reviews</span>
-                <span class="stat-item">{{ course._count.enrollments || 0 }} Students</span>
-                <span class="stat-item">{{ getInstructorCourseCount() }} Courses</span>
-              </div>
-            </div>
-          </div>
-          <p class="section-text">{{ course.instructor.about || 'No instructor information available.' }}</p>
-        </div>
-
-        <!-- Syllabus -->
-        <div *ngIf="activeTab === 'syllabus'" class="content-section">
-          <h2 class="section-title">Course Content</h2>
-          <div class="course-stats">
-            <div class="stats-grid">
-              <span class="stat-item">{{ getTotalModules() }} modules</span>
-              <span class="stat-separator">•</span>
-              <span class="stat-item">{{ getTotalLessons() }} lessons</span>
-              <span class="stat-separator">•</span>
-              <span class="stat-item">{{ course.difficulty }} level</span>
-            </div>
-          </div>
-          <div class="modules-container">
-            <div *ngFor="let module of course.modules" class="module-card">
-              <div (click)="toggleModule(module)" class="module-header">
-                <h3 class="module-title">{{ module.title }}</h3>
-                <div class="module-meta">
-                  <span class="lesson-count">{{ module.lessons.length }} lessons</span>
-                  <svg class="chevron-icon"
-                       [class.rotated]="module.open"
-                       fill="none"
-                       stroke="currentColor"
-                       viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-              <div *ngIf="module.open" class="module-content">
-                <div class="lessons-list">
-                  <div *ngFor="let lesson of module.lessons" 
-                       class="lesson-item"
-                       [class.enrolled]="isEnrolled"
-                       [class.clickable]="isEnrolled"
-                       (click)="isEnrolled ? accessLesson(lesson) : null">
-                    <!-- Icon based on content type -->
-                    <svg *ngIf="lesson.contentType === 'video'" class="lesson-icon video-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <svg *ngIf="lesson.contentType === 'pdf'" class="lesson-icon pdf-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                    <svg *ngIf="lesson.contentType === 'text'" class="lesson-icon text-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <span class="lesson-title">{{ lesson.title }}</span>
-                    <!-- Access indicator for enrolled students -->
-                    <svg *ngIf="isEnrolled" class="access-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Learner Reviews -->
-        <div *ngIf="activeTab === 'reviews'" class="content-section">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="section-title">Learner Reviews</h2>
-            <!-- Add Review Button - Only for enrolled students who haven't reviewed -->
-            <button 
-              *ngIf="user?.role === 'STUDENT' && isEnrolled && !userHasReviewed && !showReviewForm"
-              (click)="toggleReviewForm()"
-              class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-              Add Review
-            </button>
-          </div>
-
-          <!-- Review Form -->
-          <div *ngIf="showReviewForm" class="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 class="text-md font-semibold text-gray-800 mb-3">Write Your Review</h3>
-            
-            <!-- Rating Stars -->
-            <div class="flex items-center mb-3">
-              <span class="text-sm text-gray-700 mr-2">Rating:</span>
-              <div class="flex gap-1">
-                <ng-container *ngFor="let i of [1,2,3,4,5]">
-                  <button 
-                    (click)="setReviewRating(i)"
-                    class="text-2xl transition-colors"
-                    [ngClass]="{'text-yellow-400': i <= newReviewRating, 'text-gray-300': i > newReviewRating}">
-                    ★
-                  </button>
-                </ng-container>
-              </div>
-              <span class="ml-2 text-sm text-gray-600">{{ newReviewRating }}/5</span>
-            </div>
-            
-            <!-- Review Comment -->
-            <div class="mb-3">
-              <label class="block text-sm text-gray-700 mb-1">Your Review:</label>
-              <textarea 
-                [(ngModel)]="newReviewComment"
-                rows="4"
-                placeholder="Share your experience with this course..."
-                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none">
-              </textarea>
-            </div>
-            
-            <!-- Submit/Cancel Buttons -->
-            <div class="flex gap-2">
-              <button 
-                (click)="submitReview()"
-                [disabled]="submittingReview || !newReviewComment.trim()"
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                <span *ngIf="submittingReview">Submitting...</span>
-                <span *ngIf="!submittingReview">Submit Review</span>
-              </button>
-              <button 
-                (click)="toggleReviewForm()"
-                [disabled]="submittingReview"
-                class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50">
-                Cancel
-              </button>
-            </div>
-          </div>
-          <div class="reviews-summary" *ngIf="courseReviews">
-            <span class="rating-score">{{ courseReviews.averageRating.toFixed(1) }}</span>
-            <div class="rating-details">
-              <div class="stars-container">
-                <ng-container *ngFor="let i of [1,2,3,4,5]">
-                  <svg *ngIf="i <= courseReviews.averageRating" class="star-icon filled" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg *ngIf="i > courseReviews.averageRating" class="star-icon empty" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                </ng-container>
-              </div>
-              <span class="rating-count">{{ courseReviews.totalReviews }} ratings</span>
-            </div>
-            <div class="rating-breakdown">
-              <div class="rating-bar">
-                <div class="rating-bar-bg">
-                  <div class="rating-bar-fill" style="width: 80%"></div>
-                </div>
-                <span class="rating-label">
-                  <svg *ngFor="let i of [1,2,3,4,5]" class="star-icon small filled" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                </span>
-                <span class="rating-count">{{ getRatingCount(5) }}</span>
-              </div>
-              <div class="rating-bar">
-                <div class="rating-bar-bg">
-                  <div class="rating-bar-fill" [style.width.%]="getRatingPercentage(5)"></div>
-                </div>
-                <span class="rating-label">
-                  <svg *ngFor="let i of [1,2,3,4]" class="star-icon small filled" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg class="star-icon small empty" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                </span>
-                <span class="rating-count">{{ course.totalReviews || 0 }}</span>
-              </div>
-              <div class="rating-bar">
-                <div class="rating-bar-bg">
-                  <div class="rating-bar-fill" [style.width.%]="getRatingPercentage(3)"></div>
-                </div>
-                <span class="rating-label">
-                  <svg *ngFor="let i of [1,2,3]" class="star-icon small filled" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg *ngFor="let i of [1,2]" class="star-icon small empty" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                </span>
-                <span class="rating-count">{{ getRatingCount(3) }}</span>
-              </div>
-              <div class="rating-bar">
-                <div class="rating-bar-bg">
-                  <div class="rating-bar-fill" [style.width.%]="getRatingPercentage(2)"></div>
-                </div>
-                <span class="rating-label">
-                  <svg *ngFor="let i of [1,2]" class="star-icon small filled" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg *ngFor="let i of [1,2,3]" class="star-icon small empty" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                </span>
-                <span class="rating-count">{{ getRatingCount(2) }}</span>
-              </div>
-              <div class="rating-bar">
-                <div class="rating-bar-bg">
-                  <div class="rating-bar-fill" [style.width.%]="getRatingPercentage(1)"></div>
-                </div>
-                <span class="rating-label">
-                  <svg class="star-icon small filled" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                  <svg *ngFor="let i of [1,2,3,4]" class="star-icon small empty" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                  </svg>
-                </span>
-                <span class="rating-count">{{ course.totalReviews || 0 }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="reviews-list">
-            <div *ngIf="loadingReviews" class="text-center py-8">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p class="text-gray-600 mt-2">Loading reviews...</p>
-            </div>
-            <div *ngIf="!loadingReviews && reviews.length === 0" class="text-center py-8">
-              <p class="text-gray-600">No reviews yet. Be the first to review this course!</p>
-            </div>
-            <div *ngFor="let review of reviews" class="review-card">
-              <div class="review-header">
-                <img [src]="review.student.profileImage || '/assets/images/student1-removebg-preview.png'" alt="{{ review.student.firstName }} {{ review.student.lastName }}" class="reviewer-avatar">
-                <div class="review-content">
-                  <div class="reviewer-info">
-                    <h4 class="reviewer-name">{{ review.student.firstName }} {{ review.student.lastName }}</h4>
-                    <div class="review-stars">
-                      <ng-container *ngFor="let i of [1,2,3,4,5]">
-                        <svg *ngIf="i <= review.rating" class="star-icon small filled" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                        </svg>
-                        <svg *ngIf="i > review.rating" class="star-icon small" fill="none" stroke="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                        </svg>
-                      </ng-container>
-                    </div>
-                    <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
-                  </div>
-                  <p class="review-text">{{ review.comment || 'No comment provided' }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button class="view-all-reviews-btn">View All Reviews</button>
-        </div>
-
-        <!-- Related Courses -->
-        <div class="content-section">
-          <h2 class="section-title">
-            <ng-container *ngIf="hasSameCategoryCourses(); else otherCoursesTitle">
-              More Courses Like This
-            </ng-container>
-            <ng-template #otherCoursesTitle>
-              Other Courses You Might Like
-            </ng-template>
-          </h2>
-          <div *ngIf="relatedCourses.length > 0; else noCoursesMessage" class="related-courses-grid">
-            <div *ngFor="let relatedCourse of relatedCourses" class="related-course-card">
-              <img [src]="relatedCourse.imageUrl" alt="{{ relatedCourse.title }}" class="course-thumbnail">
-              <div class="course-info">
-                <h4 class="course-name">{{ relatedCourse.title }}</h4>
-                <p class="course-author">By {{ relatedCourse.instructor.firstName }} {{ relatedCourse.instructor.lastName }}</p>
-                <div class="course-rating">
-                  <div class="stars-container">
-                    <svg *ngFor="let i of [1,2,3,4]" class="star-icon small filled" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                    </svg>
-                    <svg class="star-icon small empty" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                    </svg>
-                  </div>
-                  <span class="rating-count">({{ relatedCourse._count.reviews }} Ratings)</span>
-                </div>
-                <p class="course-price">${{ relatedCourse.price }}</p>
-              </div>
-            </div>
-          </div>
-          <ng-template #noCoursesMessage>
-            <div class="no-courses-message">
-              <p>No other courses available at the moment. Check back soon for new courses!</p>
-            </div>
-          </ng-template>
-        </div>
-      </div>
-
       <!-- Right Sidebar -->
-      <div class="sidebar">
-        <div class="sidebar-card">
-          <div class="course-image-container">
-            <img [src]="course.imageUrl || 'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80'"
-                 [alt]="course.title"
-                 class="course-image">
+      <div class="lg:col-span-1 order-first lg:order-last">
+        <div class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
+          <div class="aspect-w-16 aspect-h-9 mb-6">
+            <img [src]="course.imageUrl || 'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80'" 
+                 [alt]="course.title" 
+                 class="rounded-lg w-full h-48 object-cover">
           </div>
-          <div class="pricing-section">
-            <div class="price-container">
-              <span class="course-price-large">KSH {{ course.price }}</span>
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-3xl font-bold text-gray-900">KSH {{ course.price }}</span>
             </div>
-            
-            <!-- Access Course - For enrolled students -->
-            <button 
-              *ngIf="isEnrolled && !isCourseCompleted"
-              class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors mb-3"
-              (click)="accessCourse()">
-              Access Course
-            </button>
-            
-            <!-- Course Completed - For enrolled students who completed the course -->
-            <button 
-              *ngIf="isEnrolled && isCourseCompleted"
-              class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold mb-3 cursor-default"
-              disabled>
-              <div class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Course Completed
-              </div>
-            </button>
-            
-            <!-- Add to Cart - Only for logged in students who are not enrolled -->
-            <button 
-              *ngIf="!isEnrolled && user?.role === 'STUDENT'"
-              class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors mb-3"
-              (click)="addToCart()"
-              [disabled]="isInCart">
-              <span *ngIf="!isInCart">Add to Cart</span>
-              <span *ngIf="isInCart">In Cart</span>
-            </button>
-
-            <!-- Go to Cart - Only for logged in students -->
-            <button 
-              *ngIf="user?.role === 'STUDENT'"
-              class="w-full bg-gray-200 text-blue-800 py-2 rounded-lg hover:bg-blue-100 transition-colors border border-blue-700"
-              (click)="goToCart()">
-              Go to Cart
-            </button>
-
-            <!-- Login to Purchase - For non-logged in users -->
-            <button 
-              *ngIf="!authenticated"
-              class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors mb-3"
-              (click)="goToLogin()">
-              Login to Purchase
+            <button class="w-full bg-blue-600 text-white rounded-lg px-6 py-3 font-semibold hover:bg-blue-700 transition-colors mb-3" *ngIf="!isAdmin">
+              Enroll Now
             </button>
           </div>
-          <div class="course-features">
-            <h3 class="features-title">This course includes:</h3>
-            <ul class="features-list">
-              <li class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="border-t border-gray-200 pt-6">
+            <h3 class="font-semibold text-gray-900 mb-4">This course includes:</h3>
+            <ul class="space-y-3">
+              <li class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 {{ getTotalLessons() }} lessons
               </li>
-              <li class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 {{ getTotalModules() }} modules
               </li>
-              <li class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Full lifetime access
               </li>
-              <li class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Access on mobile and desktop
               </li>
-              <li class="feature-item">
-                <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li class="flex items-center text-sm text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Certificate of completion
@@ -508,6 +73,308 @@
           </div>
         </div>
       </div>
+
+      <!-- Main Content -->
+      <div class="lg:col-span-2">
+        <!-- Breadcrumbs -->
+        <nav class="text-sm text-dark-gray mb-4">
+          <span>Home</span> > 
+          <span>{{ course.category.name || 'Categories' }}</span> > 
+          <span>{{ course.title }}</span>
+        </nav>
+
+        <!-- Course Header -->
+        <h1 class="text-4xl font-bold text-dark mb-2">{{ course.title }}</h1>
+        <p class="text-dark-gray mb-4">{{ course.description }}</p>
+
+        <!-- Course Meta -->
+        <div class="flex flex-wrap items-center text-sm text-dark-gray mb-4 gap-4">
+          <div class="flex items-center">
+            <svg *ngFor="let i of [1,2,3,4,5]" 
+                 class="w-5 h-5" 
+                 [class.text-yellow-500]="i <= (course._count.reviews > 0 ? 4 : 0)"
+                 [class.text-gray-300]="i > (course._count.reviews > 0 ? 4 : 0)"
+                 fill="currentColor" 
+                 viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+          </div>
+          <span>{{ course._count.reviews }} reviews</span>
+          <span>{{ getTotalLessons() }} lessons</span>
+          <span>{{ getTotalModules() }} modules</span>
+          <span>{{ course.difficulty }}</span>
+        </div>
+
+        <!-- Instructor -->
+        <div class="flex items-center mb-4">
+          <img [src]="getInstructorImage()" 
+               [alt]="getInstructorName()" 
+               class="w-10 h-10 rounded-full mr-3 object-cover">
+          <div>
+            <p class="font-bold text-dark">{{ getInstructorName() }}</p>
+            <p class="text-sm text-dark-gray">{{ course.instructor.about || 'Course Instructor' }}</p>
+          </div>
+        </div>
+
+        <!-- Additional Meta -->
+        <div class="flex flex-wrap gap-4 text-sm text-dark-gray mb-8">
+          <span>Created: {{ course.createdAt | date }}</span>
+          <span>Last updated: {{ course.updatedAt | date }}</span>
+          <span *ngIf="course.category">Category: {{ course.category.name }}</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="border-b border-border-color mb-8">
+          <nav class="flex space-x-8">
+            <button 
+              (click)="setActiveTab('description')" 
+              [class.text-primary]="activeTab === 'description'"
+              [class.border-b-2]="activeTab === 'description'"
+              [class.border-primary]="activeTab === 'description'"
+              [class.text-dark-gray]="activeTab !== 'description'"
+              class="pb-2 cursor-pointer hover:text-primary transition-colors">
+              Description
+            </button>
+            <button 
+              (click)="setActiveTab('instructor')" 
+              [class.text-primary]="activeTab === 'instructor'"
+              [class.border-b-2]="activeTab === 'instructor'"
+              [class.border-primary]="activeTab === 'instructor'"
+              [class.text-dark-gray]="activeTab !== 'instructor'"
+              class="pb-2 cursor-pointer hover:text-primary transition-colors">
+              Instructor
+            </button>
+            <button 
+              (click)="setActiveTab('syllabus')" 
+              [class.text-primary]="activeTab === 'syllabus'"
+              [class.border-b-2]="activeTab === 'syllabus'"
+              [class.border-primary]="activeTab === 'syllabus'"
+              [class.text-dark-gray]="activeTab !== 'syllabus'"
+              class="pb-2 cursor-pointer hover:text-primary transition-colors">
+              Syllabus
+            </button>
+            <button 
+              (click)="setActiveTab('reviews')" 
+              [class.text-primary]="activeTab === 'reviews'"
+              [class.border-b-2]="activeTab === 'reviews'"
+              [class.border-primary]="activeTab === 'reviews'"
+              [class.text-dark-gray]="activeTab !== 'reviews'"
+              class="pb-2 cursor-pointer hover:text-primary transition-colors">
+              Reviews
+            </button>
+          </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="mb-8">
+          <!-- Description Tab -->
+          <div *ngIf="activeTab === 'description'">
+            <h2 class="text-2xl font-bold text-dark mb-4">Course Description</h2>
+            <p class="text-dark-gray mb-4">The interactive course is designed to instill fundamental UX design principles, focusing on creating products that are intuitive, adaptable, and user-friendly. It establishes a solid foundation in UX principles and prepares you for real-world applications through engaging modules and a comprehensive certification.</p>
+            <h3 class="text-xl font-bold text-dark mb-2">Certification</h3>
+            <p class="text-dark-gray">At Byway, we understand the significance of formal recognition for your hard work and dedication. Upon successful completion of our courses, you will earn a prestigious certification that not only validates your expertise but also opens doors to new opportunities in your chosen field.</p>
+          </div>
+
+          <!-- Instructor Tab -->
+          <div *ngIf="activeTab === 'instructor'">
+            <h2 class="text-2xl font-bold text-dark mb-4">Instructor</h2>
+            <div class="flex items-center mb-4">
+              <img [src]="getInstructorImage()" 
+                   [alt]="getInstructorName()" 
+                   class="w-20 h-20 rounded-full mr-4 object-cover">
+              <div>
+                <p class="text-xl font-bold text-dark">{{ getInstructorName() }}</p>
+                <p class="text-dark-gray">Course Instructor</p>
+                <div class="flex flex-wrap items-center text-sm text-dark-gray mt-1 gap-4">
+                  <span>★ 4.5 Instructor Rating</span>
+                  <span>{{ course._count.reviews || 0 }} Reviews</span>
+                  <span>{{ course._count.enrollments || 0 }} Students</span>
+                  <span>1 Course</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-dark-gray">{{ course.instructor.about || 'No instructor information available.' }}</p>
+          </div>
+
+          <!-- Syllabus Tab -->
+          <div *ngIf="activeTab === 'syllabus'">
+            <h2 class="text-2xl font-bold text-dark mb-4">Course Content</h2>
+            <div class="bg-gray-100 rounded-lg p-4 mb-4">
+              <div class="flex flex-wrap gap-4 text-sm">
+                <span>{{ getTotalModules() }} modules</span>
+                <span>•</span>
+                <span>{{ getTotalLessons() }} lessons</span>
+                <span>•</span>
+                <span>{{ course.difficulty }} level</span>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div *ngFor="let module of course.modules" class="bg-white rounded-lg shadow-md">
+                <div (click)="toggleModule(module)" class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50">
+                  <h3 class="font-bold text-dark">{{ module.title }}</h3>
+                  <div class="flex items-center text-sm text-dark-gray">
+                    <span>{{ module.lessons.length || 0 }} lessons</span>
+                    <svg class="w-5 h-5 ml-4 transform transition-transform duration-300" 
+                         [class.rotate-180]="module.open" 
+                         fill="none" 
+                         stroke="currentColor" 
+                         viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div *ngIf="module.open" class="p-4 border-t border-gray-100">
+                  <div class="space-y-2">
+                    <div *ngFor="let lesson of module.lessons" class="flex items-center text-sm p-2 hover:bg-gray-50 rounded">
+                      <!-- Icon based on content type -->
+                      <svg *ngIf="lesson.contentType === 'video'" class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <svg *ngIf="lesson.contentType === 'pdf'" class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                      </svg>
+                      <svg *ngIf="lesson.contentType === 'text'" class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                      <span class="flex-grow">{{ lesson.title }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews Tab -->
+          <div *ngIf="activeTab === 'reviews'">
+            <h2 class="text-2xl font-bold text-dark mb-4">Reviews</h2>
+            
+            <!-- Loading State -->
+            <div *ngIf="loadingReviews" class="flex justify-center items-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+
+            <!-- Reviews Content -->
+            <div *ngIf="!loadingReviews">
+              <!-- Reviews Summary -->
+              <div *ngIf="reviewsResponse" class="bg-gray-50 rounded-lg p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center">
+                    <div class="text-3xl font-bold text-dark mr-4">{{ reviewsResponse.averageRating.toFixed(1) }}</div>
+                    <div>
+                      <div class="flex items-center mb-1">
+                        <ng-container *ngFor="let i of [1,2,3,4,5]">
+                          <svg *ngIf="i <= getRoundedRating(reviewsResponse.averageRating)" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                          </svg>
+                          <svg *ngIf="i > getRoundedRating(reviewsResponse.averageRating)" class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                          </svg>
+                        </ng-container>
+                        <span class="ml-2 text-sm text-gray-600">{{ reviewsResponse.averageRating.toFixed(1) }} out of 5</span>
+                      </div>
+                      <div class="text-sm text-gray-600">{{ reviewsResponse.totalReviews }} reviews</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reviews List -->
+              <div *ngIf="reviews.length > 0; else noReviews">
+                <div class="space-y-6">
+                  <div *ngFor="let review of reviews" class="border-b border-gray-200 pb-6 last:border-b-0">
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                          <span class="text-blue-600 font-semibold text-sm">
+                            {{ review.student.firstName.charAt(0) }}{{ review.student.lastName.charAt(0) }}
+                          </span>
+                        </div>
+                        <div>
+                          <div class="font-semibold text-dark">{{ review.student.firstName }} {{ review.student.lastName }}</div>
+                          <div class="flex items-center mt-1">
+                            <ng-container *ngFor="let i of [1,2,3,4,5]">
+                              <svg *ngIf="i <= review.rating" class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                              </svg>
+                              <svg *ngIf="i > review.rating" class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                              </svg>
+                            </ng-container>
+                            <span class="ml-2 text-xs text-gray-500">{{ review.createdAt | date:'MMM dd, yyyy' }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-dark-gray leading-relaxed">
+                      {{ review.comment || 'No comment provided' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- No Reviews Template -->
+              <ng-template #noReviews>
+                <div class="text-center py-8">
+                  <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                  </svg>
+                  <h3 class="text-lg font-semibold text-gray-600 mb-2">No Reviews Yet</h3>
+                  <p class="text-gray-500">Be the first to review this course!</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Courses -->
+        <div>
+          <h2 class="text-2xl font-bold text-dark mb-6">More Courses Like This</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div *ngFor="let relatedCourse of relatedCourses" class="bg-white rounded-lg shadow-md overflow-hidden">
+              <img [src]="relatedCourse.imageUrl || 'https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80'" alt="{{ relatedCourse.title }}" class="w-full h-32 object-cover">
+              <div class="p-4">
+                <h4 class="font-bold text-dark">{{ relatedCourse.title }}</h4>
+                <p class="text-sm text-dark-gray">By {{ relatedCourse.instructor.firstName }} {{ relatedCourse.instructor.lastName }}</p>
+                <div class="flex items-center mt-2">
+                  <div class="flex items-center">
+                    <svg *ngFor="let i of [1,2,3,4]" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                  </div>
+                  <span class="text-sm text-dark-gray ml-2">({{ relatedCourse._count.reviews || 0 }} Ratings)</span>
+                </div>
+                <p class="text-lg font-bold text-dark mt-2">${{ relatedCourse.price }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="lg:col-span-1">
+        <div class="sticky top-8">
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <img [src]="course.imageUrl" alt="{{ course.title }}" class="w-full h-56 object-cover">
+            <div class="p-6">
+              <div class="flex justify-between items-center mb-4">
+                <p class="text-3xl font-bold text-dark">${{ course.price }}</p>
+              </div>
+              <button class="w-full bg-primary text-white py-3 rounded-lg font-bold mb-3" *ngIf="!isAdmin">Add to Cart</button>
+              <button class="w-full border border-dark text-dark py-3 rounded-lg font-bold" *ngIf="!isAdmin">Buy Now</button>
+              <div class="text-center mt-4">
+                <p class="text-sm text-dark-gray">Share</p>
+                <div class="flex justify-center space-x-3 mt-2">
+                  <a href="#" class="text-dark-gray"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 6c-.8.35-1.65.58-2.5.68.9-.54 1.6-1.4 1.92-2.4-1.05.62-2.2.98-3.42 1.15-.98-.95-2.38-1.54-3.9-1.54-2.94 0-5.32 2.38-5.32 5.32 0 .42.05.83.14 1.22-4.42-.22-8.34-2.34-10.96-5.56-.46.78-.72 1.68-.72 2.64 0 1.84.94 3.47 2.38 4.42-.86-.03-1.66-.26-2.36-.65v.07c0 2.57 1.83 4.72 4.25 5.2-.44.12-.9.18-1.38.18-.34 0-.67-.03-1-.1 1.05 2.1 4.1 3.63 7.72 3.68-2.1 1.65-4.75 2.63-7.62 2.63-.5 0-1-.03-1.48-.08 2.72 1.75 5.95 2.78 9.42 2.78 11.3 0 17.5-9.36 17.5-17.5 0-.27-.01-.53-.02-.8.96-.7 1.8-1.57 2.46-2.55z"/></svg></a>
+                  <a href="#" class="text-dark-gray"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21.2 5.9c-.2-.7-.7-1.2-1.4-1.4C18.6 4 12 4 12 4s-6.6 0-7.8.5c-.7.2-1.2.7-1.4 1.4C2 7.1 2 12 2 12s0 4.9.8 6.1c.2.7.7 1.2 1.4 1.4C5.4 20 12 20 12 20s6.6 0 7.8-.5c.7-.2 1.2-.7 1.4-1.4.8-1.2.8-6.1.8-6.1s0-4.9-.8-6.1zM10 15V9l5.2 3L10 15z"/></svg></a>
+                  <a href="#" class="text-dark-gray"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-9.96 4.46-9.96 9.96s4.46 9.96 9.96 9.96c5.5 0 9.96-4.46 9.96-9.96S17.5 2.04 12 2.04zm0 17.92c-4.4 0-7.96-3.56-7.96-7.96S7.6 4.04 12 4.04s7.96 3.56 7.96 7.96-3.56 7.96-7.96 7.96zM12 6c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm0 10c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/></svg></a>
+                  <a href="#" class="text-dark-gray"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 14H9V9h6v8z"/></svg></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
 </div>
