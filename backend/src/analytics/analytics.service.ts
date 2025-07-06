@@ -16,9 +16,14 @@ export class AnalyticsService {
   async getDashboardStats(user: UserResponse): Promise<DashboardStatsResponse> {
     if (user.role === 'ADMIN') {
       // Admin can see all stats
-      const [totalUsers, totalCourses, totalEnrollments, enrollments] =
+      const [totalStudents, totalInstructors, totalCourses, totalEnrollments, enrollments] =
         await Promise.all([
-          this.prisma.user.count(),
+          this.prisma.user.count({
+            where: { role: 'STUDENT' }
+          }),
+          this.prisma.user.count({
+            where: { role: 'INSTRUCTOR' }
+          }),
           this.prisma.course.count(),
           this.prisma.courseEnrollment.count(),
           this.prisma.courseEnrollment.findMany({
@@ -38,17 +43,19 @@ export class AnalyticsService {
       }, 0);
 
       return {
-        totalUsers,
+        totalStudents,
+        totalInstructors,
         totalCourses,
         totalEnrollments,
         totalRevenue,
       };
     } else if (user.role === 'INSTRUCTOR') {
       // Instructor can only see stats for their courses
-      const [totalUsers, totalCourses, totalEnrollments, enrollments] =
+      const [totalStudents, totalCourses, totalEnrollments, enrollments] =
         await Promise.all([
           this.prisma.user.count({
             where: {
+              role: 'STUDENT',
               coursesEnrolled: {
                 some: {
                   course: {
@@ -90,7 +97,8 @@ export class AnalyticsService {
       }, 0);
 
       return {
-        totalUsers,
+        totalStudents,
+        totalInstructors: 1, // Instructor only sees themselves
         totalCourses,
         totalEnrollments,
         totalRevenue,

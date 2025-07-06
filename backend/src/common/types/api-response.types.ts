@@ -165,7 +165,8 @@ export interface EnrollmentWithStudentAndCourseResponse
 
 // Analytics Types
 export interface DashboardStatsResponse {
-  totalUsers: number;
+  totalStudents: number;
+  totalInstructors: number;
   totalCourses: number;
   totalEnrollments: number;
   totalRevenue: number;

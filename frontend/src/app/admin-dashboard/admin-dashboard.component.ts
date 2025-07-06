@@ -109,7 +109,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     
     // Initialize with fallback data
     this.dashboardStats = {
-      totalUsers: 0,
+      totalStudents: 0,
+      totalInstructors: 0,
       totalCourses: 0,
       totalEnrollments: 0,
       totalRevenue: 0

@@ -427,7 +427,7 @@ hr {
 /* Dashboard Top Grid Layout */
 .dashboard-top-grid {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 320px 1fr;
   gap: 2rem;
   align-items: start;
   margin-bottom: 2.5rem;
@@ -458,7 +458,7 @@ hr {
 .summary-cards {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -474,8 +474,8 @@ hr {
   box-shadow: 0 2px 8px rgba(10,23,78,0.06);
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  padding: 1.5rem 1.2rem;
+  gap: 1rem;
+  padding: 1.2rem 1rem;
   margin-bottom: 0;
   width: 100%;
 }
@@ -496,9 +496,10 @@ hr {
 }
 
 .summary-icon.commission { background: #2563eb22; }
-.summary-icon.received { background: #22c55e22; }
+.summary-icon.students { background: #22c55e22; }
+.summary-icon.instructors { background: #8b5cf622; }
 .summary-icon.pending { background: #f59e4222; }
-.summary-icon.enrollments { background: #8b5cf622; }
+.summary-icon.enrollments { background: #10b98122; }
 
 .summary-value {
   font-size: 1.5rem;

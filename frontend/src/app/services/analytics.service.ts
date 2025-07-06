@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface DashboardStats {
-  totalUsers: number;
+  totalStudents: number;
+  totalInstructors: number;
   totalCourses: number;
   totalEnrollments: number;
   totalRevenue: number;
