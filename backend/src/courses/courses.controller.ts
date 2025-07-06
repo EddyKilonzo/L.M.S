@@ -230,8 +230,9 @@ export class CoursesController {
   async update(
     @Param('id') id: string,
     @Body() updateCourseDto: UpdateCourseDto,
+    @CurrentUser() currentUser: UserResponse,
   ) {
-    return await this.coursesService.update(id, updateCourseDto);
+    return await this.coursesService.update(id, updateCourseDto, currentUser);
   }
 
   @Delete(':id')

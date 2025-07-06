@@ -160,17 +160,32 @@ export class CheckoutComponent implements OnInit {
     setTimeout(() => {
       // Remove from cart after successful payment
       this.cartService.removeFromCart(this.course!.id);
+      
+      console.log('Attempting to enroll in course:', this.course!.id);
+      console.log('Current user:', this.user);
+      
       // Enroll the student in the course
       this.enrollmentsService.enroll(this.course!.id).subscribe({
-        next: () => {
+        next: (response) => {
+          console.log('Enrollment successful:', response);
           this.toastService.show('Payment successful! You are now enrolled.', 'success');
-          this.router.navigate(['/course', this.course!.id]);
+          this.router.navigate(['/course-learning', this.course!.id]);
         },
         error: (err: any) => {
+          console.error('Enrollment error:', err);
+          console.error('Error status:', err.status);
+          console.error('Error message:', err.message);
+          
           if (err.status === 409) {
             this.toastService.show('You are already enrolled in this course.', 'info');
+            this.router.navigate(['/course', this.course!.id]);
+          } else if (err.status === 404) {
+            this.toastService.show('Course not found. Please try again.', 'error');
+          } else if (err.status === 401) {
+            this.toastService.show('Please login again to complete enrollment.', 'error');
+            this.router.navigate(['/login']);
           } else {
-            this.toastService.show('Payment succeeded, but enrollment failed. Please contact support.', 'error');
+            this.toastService.show(`Payment succeeded, but enrollment failed: ${err.message || 'Unknown error'}. Please contact support.`, 'error');
           }
           // Do not redirect; stay on the current page
         }

@@ -66,9 +66,7 @@ export class CoursesService {
             firstName: true,
             lastName: true,
             email: true,
-            role: true,
-            isVerified: true,
-            createdAt: true,
+            profileImage: true,
           },
         },
         category: true,
@@ -135,6 +133,7 @@ export class CoursesService {
               firstName: true,
               lastName: true,
               email: true,
+              profileImage: true,
             },
           },
           category: true,
@@ -170,6 +169,7 @@ export class CoursesService {
             firstName: true,
             lastName: true,
             email: true,
+            profileImage: true,
           },
         },
         category: true,
@@ -219,6 +219,7 @@ export class CoursesService {
               firstName: true,
               lastName: true,
               email: true,
+              profileImage: true,
             },
           },
           category: true,
@@ -259,6 +260,7 @@ export class CoursesService {
             firstName: true,
             lastName: true,
             email: true,
+            profileImage: true,
           },
         },
         category: true,
@@ -275,7 +277,20 @@ export class CoursesService {
   async update(
     id: string,
     updateCourseDto: UpdateCourseDto,
+    currentUser: UserResponse,
   ): Promise<CourseWithInstructorAndCategoryResponse> {
+    // Check if user is admin or the course owner
+    if (currentUser.role !== 'ADMIN') {
+      const course = await this.prisma.course.findUnique({
+        where: { id },
+        select: { instructorId: true },
+      });
+
+      if (!course || course.instructorId !== currentUser.id) {
+        throw new ForbiddenException('You can only update your own courses');
+      }
+    }
+
     // Extract modules from the update data
     const { modules, ...courseData } = updateCourseDto as UpdateCourseDto & {
       modules?: {
@@ -292,7 +307,19 @@ export class CoursesService {
       }[];
     };
 
-    // First, delete existing modules and lessons for this course
+    // Delete existing data in the correct order to avoid foreign key constraints
+    // First, delete student lesson completions
+    await this.prisma.studentLessonCompletion.deleteMany({
+      where: {
+        lesson: {
+          module: {
+            courseId: id,
+          },
+        },
+      },
+    });
+
+    // Then delete lessons
     await this.prisma.lesson.deleteMany({
       where: {
         module: {
@@ -301,6 +328,7 @@ export class CoursesService {
       },
     });
 
+    // Finally delete modules
     await this.prisma.courseModule.deleteMany({
       where: {
         courseId: id,
@@ -342,6 +370,7 @@ export class CoursesService {
             firstName: true,
             lastName: true,
             email: true,
+            profileImage: true,
           },
         },
         category: true,

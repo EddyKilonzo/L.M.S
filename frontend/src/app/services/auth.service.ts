@@ -146,11 +146,6 @@ export class AuthService {
         console.log('AuthService setting currentUserSubject to:', response.user);
         this.currentUserSubject.next(response.user);
         console.log('AuthService currentUserSubject updated');
-        // Redirect admin to admin dashboard
-        if (response.user.role === 'ADMIN') {
-          console.log('Admin user detected, redirecting to admin dashboard');
-          this.router.navigate(['/admin-dashboard']);
-        }
       }),
       catchError(this.handleError)
     );

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -62,6 +62,7 @@ export class CourseLearningComponent implements OnInit {
   isMarkingComplete = false;
   courseProgress: any = null;
   isCourseCompleted = false;
+  completedLessonIds: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -72,7 +73,8 @@ export class CourseLearningComponent implements OnInit {
     private progressService: ProgressService,
     private reviewsService: ReviewsService,
     private toastService: ToastService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -194,12 +196,40 @@ export class CourseLearningComponent implements OnInit {
   }
 
   selectLesson(lesson: any) {
-    this.currentLesson = lesson;
+    console.log('Selecting lesson:', lesson);
+    
+    // Temporarily clear currentLesson to force re-render
+    this.currentLesson = null;
+    this.cdr.detectChanges();
+    
+    // Set the new lesson after a brief delay
+    setTimeout(() => {
+      this.currentLesson = lesson;
+      this.cdr.detectChanges();
+      
+      // Force change detection for video elements
+      if (lesson.contentType === 'video' && lesson.contentUrl) {
+        // Add a small delay to ensure the DOM updates
+        setTimeout(() => {
+          const videoElement = document.getElementById('video-' + lesson.id) as HTMLVideoElement;
+          if (videoElement) {
+            videoElement.load(); // Force reload the video
+            console.log('Video element reloaded for lesson:', lesson.id);
+          }
+        }, 100);
+      }
+    }, 50);
+    
     if (lesson.contentType === 'pdf' && lesson.contentUrl) {
       this.safePdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(lesson.contentUrl);
     } else {
       this.safePdfUrl = null;
     }
+  }
+
+  // Track by function for video elements
+  trackByLessonId(index: number, lesson: any): string {
+    return lesson.id;
   }
 
   // Accordion toggle for modules
@@ -263,6 +293,7 @@ export class CourseLearningComponent implements OnInit {
       next: (progress) => {
         this.courseProgress = progress;
         this.isCourseCompleted = progress.enrollment.completed;
+        this.completedLessonIds = progress.completedLessonIds || [];
         console.log('Course progress loaded:', progress);
         console.log('Course completed:', this.isCourseCompleted);
       },
@@ -345,5 +376,9 @@ export class CourseLearningComponent implements OnInit {
         }
       }
     });
+  }
+
+  isLessonCompleted(lessonId: string): boolean {
+    return this.completedLessonIds.includes(lessonId);
   }
 } 

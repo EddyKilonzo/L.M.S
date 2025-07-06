@@ -177,6 +177,15 @@ export class UpdateCourseDto {
   prerequisites?: string[];
 
   @ApiProperty({
+    description: 'Category ID',
+    example: 'clx1234567890abcdef',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiProperty({
     description: 'Course difficulty level',
     enum: Difficulty,
     required: false,
@@ -202,4 +211,45 @@ export class UpdateCourseDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @ApiProperty({
+    description: 'Course modules with lessons',
+    required: false,
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        description: { type: 'string' },
+        order: { type: 'number' },
+        lessons: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              description: { type: 'string' },
+              contentType: { type: 'string', enum: ['video', 'pdf', 'text'] },
+              contentUrl: { type: 'string' },
+              order: { type: 'number' },
+            },
+          },
+        },
+      },
+    },
+  })
+  @IsOptional()
+  @IsArray()
+  modules?: {
+    title: string;
+    description: string;
+    order: number;
+    lessons: {
+      title: string;
+      description: string;
+      contentType: 'video' | 'pdf' | 'text';
+      contentUrl?: string;
+      order: number;
+    }[];
+  }[];
 }

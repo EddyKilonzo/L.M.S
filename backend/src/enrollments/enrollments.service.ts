@@ -290,12 +290,26 @@ export class EnrollmentsService {
     progress: number;
     completedModules: number;
     totalModules: number;
+    completedLessonIds: string[];
   }> {
     const enrollment = await this.prisma.courseEnrollment.findFirst({
       where: { studentId, courseId },
       include: {
+        student: true,
         course: {
           include: {
+            instructor: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                role: true,
+                isVerified: true,
+                createdAt: true,
+                profileImage: true,
+              },
+            },
             modules: {
               include: {
                 lessons: true,
@@ -326,6 +340,20 @@ export class EnrollmentsService {
       },
     });
 
+    // Get completed lesson IDs
+    const completedLessonRecords = await this.prisma.studentLessonCompletion.findMany({
+      where: {
+        studentId,
+        lesson: {
+          module: {
+            courseId,
+          },
+        },
+      },
+      select: { lessonId: true },
+    });
+    const completedLessonIds = completedLessonRecords.map(r => r.lessonId);
+
     const totalModules = enrollment.course.modules.length;
     const completedModules = await this.prisma.courseModule.count({
       where: {
@@ -342,17 +370,21 @@ export class EnrollmentsService {
       },
     });
 
-    const progress =
-      totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+    // Transform the enrollment to match the API response type
+    const transformedEnrollment = {
+      ...enrollment,
+      completedAt: enrollment.completedAt || undefined,
+      certificateUrl: enrollment.certificateUrl || undefined,
+    };
 
     return {
-      enrollment:
-        enrollment as unknown as EnrollmentWithStudentAndCourseResponse,
+      enrollment: transformedEnrollment,
       completedLessons,
       totalLessons,
-      progress,
+      progress: enrollment.progress,
       completedModules,
       totalModules,
+      completedLessonIds,
     };
   }
 

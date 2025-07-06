@@ -27,10 +27,19 @@ export class Login {
     if (form.valid) {
       this.isLoading = true;
       this.authService.login(this.model).subscribe({
-        next: () => {
+        next: (response) => {
           this.isLoading = false;
           this.toastService.success('Login successful! Welcome back.');
-          this.router.navigate(['/profile']);
+          
+          // Redirect based on user role
+          if (response.user.role === 'ADMIN') {
+            this.router.navigate(['/admin-dashboard']);
+          } else if (response.user.role === 'STUDENT') {
+            this.router.navigate(['/courses']);
+          } else {
+            // For instructors, redirect to profile or course creation
+            this.router.navigate(['/profile']);
+          }
         },
         error: (err) => {
           this.isLoading = false;

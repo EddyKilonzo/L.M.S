@@ -3,44 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SharedNavbar } from '../shared/navbar/navbar.component';
-import { CoursesService } from '../services/courses.service';
+import { CoursesService, Course } from '../services/courses.service';
 import { CategoriesService } from '../services/categories.service';
 import { ToastService } from '../services/toast.service';
+import { CartService } from '../services/cart.service';
+import { AuthService } from '../services/auth.service';
 
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl?: string;
-  instructor: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  category: {
-    id: string;
-    name: string;
-  };
-  price: number;
-  difficulty: string;
-  createdAt: string;
-  updatedAt: string;
-  _count: {
-    enrollments: number;
-    reviews: number;
-  };
-  modules?: {
-    id: string;
-    title: string;
-    lessons?: {
-      id: string;
-      title: string;
-    }[];
-  }[];
-  averageRating?: number;
-  totalReviews?: number;
-}
+
 
 interface Category {
   id: string;
@@ -107,7 +76,9 @@ export class CourseCategoryComponent implements OnInit {
   constructor(
     private coursesService: CoursesService,
     private categoriesService: CategoriesService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private cartService: CartService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -278,8 +249,8 @@ export class CourseCategoryComponent implements OnInit {
   }
 
   getCourseRating(course: Course): number {
-    // Use real average rating from backend
-    return course.averageRating || 0;
+    // Use real average rating from backend - handle missing property
+    return (course as any).averageRating || 0;
   }
 
   getCourseHours(course: Course): number {
@@ -294,5 +265,26 @@ export class CourseCategoryComponent implements OnInit {
     // Count total lessons across all modules
     return course.modules?.reduce((total, module) => 
       total + (module.lessons?.length || 0), 0) || 0;
+  }
+
+  // Cart functionality
+  addToCart(event: Event, course: Course) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.cartService.addToCart(course);
+    this.toastService.show('Course added to cart successfully!', 'success');
+  }
+
+  isInCart(courseId: string): boolean {
+    return this.cartService.isInCart(courseId);
+  }
+
+  get isStudent(): boolean {
+    return this.authService.currentUser?.role === 'STUDENT';
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.currentUser?.role === 'ADMIN';
   }
 }

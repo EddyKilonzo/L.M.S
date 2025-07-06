@@ -14,6 +14,7 @@ export interface CourseProgress {
   progress: number;
   completedModules: number;
   totalModules: number;
+  completedLessonIds: string[];
 }
 
 export interface EnrollmentStats {

@@ -5,14 +5,17 @@ import { catchError } from 'rxjs/operators';
 
 export interface Enrollment {
   id: string;
-  userId: string;
+  studentId: string;
   courseId: string;
   enrolledAt: string;
   completed: boolean;
   progress: number;
+  completedAt?: string;
+  certificateUrl?: string;
   course: {
     id: string;
     title: string;
+    description: string;
     price: number;
     instructor: {
       id: string;
@@ -23,8 +26,25 @@ export interface Enrollment {
 }
 
 export interface EnrollmentResponse {
-  message: string;
-  enrollment: Enrollment;
+  id: string;
+  studentId: string;
+  courseId: string;
+  enrolledAt: string;
+  progress: number;
+  completed: boolean;
+  completedAt?: string;
+  certificateUrl?: string;
+  student: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  course: {
+    id: string;
+    title: string;
+    description: string;
+  };
 }
 
 @Injectable({
@@ -54,9 +74,18 @@ export class EnrollmentsService {
   }
 
   enrollInCourse(courseId: string): Observable<EnrollmentResponse> {
+    console.log('EnrollmentsService: Attempting to enroll in course:', courseId);
+    console.log('EnrollmentsService: API URL:', `${this.apiUrl}/enroll/${courseId}`);
+    
     return this.http
-      .post<EnrollmentResponse>(`${this.apiUrl}`, { courseId })
-      .pipe(catchError(this.handleError));
+      .post<EnrollmentResponse>(`${this.apiUrl}/enroll/${courseId}`, {})
+      .pipe(
+        catchError((error) => {
+          console.error('EnrollmentsService: Error enrolling in course:', error);
+          console.error('EnrollmentsService: Error URL:', `${this.apiUrl}/enroll/${courseId}`);
+          return this.handleError(error);
+        })
+      );
   }
 
   enroll(courseId: string): Observable<EnrollmentResponse> {

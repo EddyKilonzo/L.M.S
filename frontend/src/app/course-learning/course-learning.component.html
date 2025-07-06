@@ -8,7 +8,7 @@
         <!-- Lesson Viewer -->
         <div *ngIf="currentLesson">
           <div *ngIf="currentLesson.contentType === 'video'">
-            <video *ngIf="currentLesson.contentUrl" controls class="w-full rounded-lg mb-4" (ended)="onVideoEnded()">
+            <video *ngIf="currentLesson.contentUrl" controls class="w-full rounded-lg mb-4" (ended)="onVideoEnded()" [attr.id]="'video-' + currentLesson.id">
               <source [src]="currentLesson.contentUrl" type="video/mp4">
               Your browser does not support the video tag.
             </video>
@@ -26,13 +26,15 @@
           <div *ngIf="user?.role === 'STUDENT' && !isCourseCompleted" class="mt-6 flex justify-center">
             <button 
               (click)="markLessonComplete()"
-              [disabled]="isMarkingComplete"
+              [disabled]="isMarkingComplete || isLessonCompleted(currentLesson?.id)"
               class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2">
               <div *ngIf="isMarkingComplete" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <svg *ngIf="!isMarkingComplete" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg *ngIf="!isMarkingComplete && !isLessonCompleted(currentLesson?.id)" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
-              {{ isMarkingComplete ? 'Marking Complete...' : 'Mark as Complete' }}
+              <span *ngIf="isMarkingComplete">Marking Complete...</span>
+              <span *ngIf="!isMarkingComplete && !isLessonCompleted(currentLesson?.id)">Mark as Complete</span>
+              <span *ngIf="!isMarkingComplete && isLessonCompleted(currentLesson?.id)">Completed</span>
             </button>
           </div>
           

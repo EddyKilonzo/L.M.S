@@ -12,9 +12,11 @@ import {
   withInterceptors,
   HttpRequest,
   HttpHandlerFn,
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
 
 import { routes } from './app.routes';
 
@@ -38,7 +40,16 @@ export const appConfig: ApplicationConfig = {
             });
           }
 
-          return next(req);
+          return next(req).pipe(
+            catchError((error: HttpErrorResponse) => {
+              if (error.status === 401) {
+                // Token might be expired or invalid
+                localStorage.clear();
+                router.navigate(['/login']);
+              }
+              return throwError(() => error);
+            })
+          );
         },
       ])
     ),
